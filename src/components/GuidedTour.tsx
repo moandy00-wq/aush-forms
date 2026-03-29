@@ -328,14 +328,14 @@ export function GuidedTour() {
       <AnimatePresence>
         {showFinale && (
           <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center"
+            className="fixed inset-0 z-[200] flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
           >
             {/* Blurred backdrop */}
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-lg" />
 
             <motion.div
               className="relative mx-6 w-full max-w-lg overflow-hidden rounded border border-neutral-800 bg-[#0d0d0d] shadow-2xl shadow-cyan-500/5"
