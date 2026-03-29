@@ -38,9 +38,9 @@ const tourSteps: TourStep[] = [
   {
     targetId: 'features',
     title: 'Powerful Features',
-    description: 'OCR document scanning, auto-save, PDF generation, multi-language support, notifications — everything built in.',
+    description: 'OCR document scanning, auto-save, PDF generation, multi-language support, notifications — everything built in. Watch the orbit showcase each one.',
     position: 'top',
-    delay: 4500,
+    delay: 7000,
   },
   {
     targetId: '__testimonials',
@@ -100,16 +100,33 @@ export function GuidedTour() {
     el = document.getElementById(targetId)
 
     if (el && lenisRef.current) {
-      lenisRef.current.scrollTo(el, { offset: -100, duration: 2.0 })
+      lenisRef.current.scrollTo(el, { offset: -100, duration: 1.8 })
     } else if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
 
-    // Dispatch event to trigger workflow animation when scrolling to that section
+    // Trigger workflow animation
     if (targetId === 'how-it-works') {
       setTimeout(() => {
         window.dispatchEvent(new Event('workflow-tour-trigger'))
-      }, 2200) // Wait for scroll to finish
+      }, 2000)
+    }
+
+    // Auto-demo orbital features: click 3 nodes sequentially
+    if (targetId === 'features') {
+      const nodesToShow = [0, 2, 5] // OCR Auto-Fill, Auto-Save, Mobile Ready
+      let i = 0
+      const showNext = () => {
+        if (i >= nodesToShow.length) {
+          // Deselect and resume rotation
+          window.dispatchEvent(new CustomEvent('orbital-tour', { detail: { action: 'deselect' } }))
+          return
+        }
+        window.dispatchEvent(new CustomEvent('orbital-tour', { detail: { action: 'select', nodeIndex: nodesToShow[i] } }))
+        i++
+        setTimeout(showNext, 1200)
+      }
+      setTimeout(showNext, 2200) // Wait for scroll
     }
   }, [])
 

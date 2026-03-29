@@ -5,6 +5,8 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Fingerprint, Loader2 } from 'lucide-react'
+import { AnimatedGridBackground } from '@/components/ui/AnimatedGridBackground'
+import { FloatingShapes } from '@/components/ui/FloatingShapes'
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
@@ -52,7 +54,9 @@ export default function LoginPage() {
         variants={slideIn}
         className="relative hidden w-[45%] overflow-hidden bg-gradient-to-br from-cyan-950 via-[#0a1628] to-neutral-950 lg:flex lg:flex-col lg:justify-between"
       >
-        <div className="dot-grid absolute inset-0 opacity-60" />
+        <AnimatedGridBackground color="#06b6d4" maxLights={3} gridSize={40} />
+        <FloatingShapes />
+
         <div className="relative z-10 p-10">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded bg-cyan-500">
@@ -78,20 +82,21 @@ export default function LoginPage() {
           {/* Decorative card stack */}
           <div className="mt-10 space-y-3">
             {['Sarah Chen — Financial Planning', 'Marcus Rivera — New Patient', 'Amanda Foster — Case Review'].map((item, i) => (
-              <div
+              <motion.div
                 key={i}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1 - i * 0.2, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.8 + i * 0.15 }}
                 className="flex items-center gap-3 rounded border border-white/5 bg-white/[0.03] px-4 py-3 backdrop-blur-sm"
-                style={{ opacity: 1 - i * 0.2 }}
               >
-                <div className="h-2 w-2 rounded-full bg-cyan-400" style={{ animationDelay: `${i * 0.3}s` }} />
+                <div className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" style={{ animationDelay: `${i * 0.3}s` }} />
                 <span className="text-xs text-neutral-300">{item}</span>
                 <span className="ml-auto text-[10px] text-neutral-500">Just now</span>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
 
-        {/* Gradient orb */}
         <div className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-cyan-500/10 blur-[100px]" />
       </motion.div>
 
@@ -145,7 +150,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full overflow-hidden rounded-sm bg-cyan-600 py-3 text-sm font-semibold text-white transition-all hover:bg-cyan-500 disabled:opacity-50"
+              className="shimmer-line group relative w-full overflow-hidden rounded-sm bg-cyan-600 py-3 text-sm font-semibold text-white transition-all hover:bg-cyan-500 disabled:opacity-50"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

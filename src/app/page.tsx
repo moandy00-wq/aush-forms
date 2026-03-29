@@ -4,6 +4,9 @@ import { motion, useInView } from 'framer-motion'
 import { useRef, useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { GuidedTour } from '@/components/GuidedTour'
+import { AnimatedGridBackground } from '@/components/ui/AnimatedGridBackground'
+import { FloatingShapes } from '@/components/ui/FloatingShapes'
+import RadialOrbitalTimeline from '@/components/ui/RadialOrbitalTimeline'
 import {
   ScanText, Globe, Save, FileDown, Moon, Smartphone, Bell, Palette,
   ClipboardList, DollarSign, Heart, Scale, FileText, ArrowRight,
@@ -169,7 +172,6 @@ function WorkflowDemo() {
   const [activeStep, setActiveStep] = useState(-1)
   const hasPlayedRef = useRef(false)
 
-  // Play the sequential animation
   const playAnimation = useCallback(() => {
     setActiveStep(-1)
     const timers: ReturnType<typeof setTimeout>[] = []
@@ -179,7 +181,6 @@ function WorkflowDemo() {
     return timers
   }, [])
 
-  // Trigger on scroll into view (first time only via natural scroll)
   useEffect(() => {
     if (!isInView || hasPlayedRef.current) return
     hasPlayedRef.current = true
@@ -187,25 +188,21 @@ function WorkflowDemo() {
     return () => timers.forEach(clearTimeout)
   }, [isInView, playAnimation])
 
-  // Listen for tour trigger event
   useEffect(() => {
     function handleTourTrigger() {
       setActiveStep(-1)
-      // Small delay so the reset takes effect before replaying
       setTimeout(() => {
         const timers = playAnimation()
-        // Cleanup on next trigger
         const cleanup = () => timers.forEach(clearTimeout)
         window.addEventListener('workflow-tour-trigger', cleanup, { once: true })
       }, 100)
     }
-
     window.addEventListener('workflow-tour-trigger', handleTourTrigger)
     return () => window.removeEventListener('workflow-tour-trigger', handleTourTrigger)
   }, [playAnimation])
 
   return (
-    <section id="how-it-works" ref={sectionRef} className="relative border-t border-neutral-100 px-6 py-24 dark:border-neutral-900">
+    <section id="how-it-works" ref={sectionRef} className="relative border-t border-neutral-100 px-4 sm:px-6 py-16 sm:py-24 dark:border-neutral-900">
       <div className="dot-grid absolute inset-0 opacity-20" />
       <div className="relative mx-auto max-w-5xl">
         <motion.div
@@ -226,12 +223,10 @@ function WorkflowDemo() {
             const isCurrent = i === activeStep
 
             return (
-              <div key={step.title} className="relative flex gap-6">
-                {/* Timeline line + dot */}
+              <div key={step.title} className="relative flex gap-3 sm:gap-6">
                 <div className="flex flex-col items-center">
-                  {/* Dot */}
                   <motion.div
-                    className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded transition-all duration-500 ${
+                    className={`relative z-10 flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded transition-all duration-500 ${
                       isActive
                         ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-500/20'
                         : 'border border-neutral-800 bg-neutral-900 text-neutral-600'
@@ -248,7 +243,6 @@ function WorkflowDemo() {
                       <div className="absolute inset-0 animate-ping rounded bg-cyan-500 opacity-20" />
                     )}
                   </motion.div>
-                  {/* Connecting line */}
                   {i < workflowSteps.length - 1 && (
                     <div className="relative w-px flex-1 min-h-[20px]">
                       <div className="absolute inset-0 bg-neutral-800" />
@@ -262,20 +256,16 @@ function WorkflowDemo() {
                   )}
                 </div>
 
-                {/* Content */}
                 <motion.div
-                  className={`mb-8 flex-1 rounded border p-5 transition-all duration-500 ${
+                  className={`mb-6 sm:mb-8 flex-1 min-w-0 rounded border p-3 sm:p-5 transition-all duration-500 ${
                     isActive
                       ? 'border-neutral-700 bg-neutral-900'
                       : 'border-neutral-800/50 bg-neutral-950/50'
                   }`}
-                  animate={{
-                    opacity: isActive ? 1 : 0.3,
-                  }}
+                  animate={{ opacity: isActive ? 1 : 0.3 }}
                   transition={{ duration: 0.4 }}
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-                    {/* Text */}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-500">Step {i + 1}</span>
@@ -300,10 +290,8 @@ function WorkflowDemo() {
                         isActive ? 'text-neutral-400' : 'text-neutral-700'
                       }`}>{step.desc}</p>
                     </div>
-
-                    {/* Visual preview */}
                     <motion.div
-                      className="w-full shrink-0 sm:w-56"
+                      className="hidden sm:block w-full shrink-0 sm:w-56"
                       animate={{ opacity: isActive ? 1 : 0.15 }}
                       transition={{ duration: 0.4, delay: 0.1 }}
                     >
@@ -351,8 +339,10 @@ export default function HomePage() {
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden px-6 pb-16 pt-16 sm:pt-24">
+        {/* Animated backgrounds */}
+        <AnimatedGridBackground />
+        <FloatingShapes />
         <div className="mesh-gradient-1 absolute inset-0" />
-        <div className="dot-grid absolute inset-0 opacity-30" />
 
         <motion.div className="relative mx-auto max-w-6xl" initial="hidden" animate="visible" variants={stagger}>
           <div className="grid items-center gap-12 lg:grid-cols-[1fr,420px]">
@@ -366,7 +356,7 @@ export default function HomePage() {
               <motion.h1 variants={fadeUp} className="font-[family-name:var(--font-display)] text-[40px] font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-[54px]">
                 Stop typing.<br />
                 Start <span className="relative inline-block">
-                  <span className="bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent">scanning.</span>
+                  <span className="animated-gradient-text bg-gradient-to-r from-cyan-400 via-teal-300 to-cyan-500 bg-clip-text text-transparent">scanning.</span>
                   <span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-gradient-to-r from-cyan-400 to-teal-400 opacity-40" />
                 </span>
               </motion.h1>
@@ -375,9 +365,9 @@ export default function HomePage() {
                 Your clients upload a photo of their ID — Aush Forms reads it, fills in their name, address, and DOB automatically. No more manual data entry.
               </motion.p>
 
-              {/* CTA — stacked, unique styling */}
+              {/* CTA */}
               <motion.div variants={fadeUp} className="mt-8 flex items-center gap-4">
-                <Link href="/signup" className="group relative overflow-hidden rounded bg-gradient-to-r from-cyan-600 to-teal-600 p-px">
+                <Link href="/signup" className="shimmer-line group relative overflow-hidden rounded bg-gradient-to-r from-cyan-600 to-teal-600 p-px">
                   <div className="relative flex items-center gap-3 rounded-[11px] bg-gradient-to-r from-cyan-600 to-teal-600 px-7 py-3.5">
                     <span className="text-sm font-bold text-white">Create Your Form</span>
                     <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-white/20">
@@ -394,7 +384,7 @@ export default function HomePage() {
               </motion.div>
 
               {/* Trust row */}
-              <motion.div variants={fadeUp} className="mt-10 flex items-center gap-6">
+              <motion.div variants={fadeUp} className="mt-10 flex flex-wrap items-center gap-4 sm:gap-6">
                 {stats.map((stat) => (
                   <div key={stat.label} className="flex items-center gap-2">
                     <stat.icon className="h-3.5 w-3.5 text-cyan-500/60" />
@@ -407,7 +397,6 @@ export default function HomePage() {
 
             {/* Right — Form Preview Card */}
             <motion.div variants={fadeUp} className="relative hidden lg:block">
-              {/* Floating OCR indicator */}
               <div className="absolute -left-8 top-12 z-20 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 shadow-lg dark:border-emerald-500/20 dark:bg-emerald-500/10">
                 <div className="flex items-center gap-2">
                   <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500">
@@ -417,7 +406,6 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Floating auto-fill badge */}
               <div className="absolute -right-4 bottom-24 z-20 rounded border border-cyan-200 bg-white px-3 py-2 shadow-lg dark:border-cyan-500/20 dark:bg-neutral-900">
                 <div className="flex items-center gap-2">
                   <ScanText className="h-3.5 w-3.5 text-cyan-500" />
@@ -425,9 +413,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Main form card */}
-              <div className="rounded border border-neutral-200/80 bg-white/90 p-6 shadow-2xl shadow-neutral-200/40 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/90 dark:shadow-black/40">
-                {/* Card header */}
+              <div className="gradient-border rounded border border-neutral-200/80 bg-white/90 p-6 shadow-2xl shadow-neutral-200/40 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/90 dark:shadow-black/40">
                 <div className="flex items-center gap-2 border-b border-neutral-100 pb-4 dark:border-neutral-800">
                   <div className="flex h-7 w-7 items-center justify-center rounded bg-cyan-500 text-[10px] font-bold text-white">T</div>
                   <div>
@@ -437,7 +423,6 @@ export default function HomePage() {
                   <div className="ml-auto rounded-full bg-cyan-50 px-2 py-0.5 text-[9px] font-bold text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-400">Step 1 of 5</div>
                 </div>
 
-                {/* Fake form fields */}
                 <div className="mt-4 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -469,7 +454,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Card footer */}
                 <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-4 dark:border-neutral-800">
                   <div className="flex items-center gap-1">
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -483,11 +467,11 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* ── How It Works — Animated Workflow Demo ── */}
+      {/* ── How It Works ── */}
       <WorkflowDemo />
 
       {/* ── Templates ── */}
-      <section id="templates" className="border-t border-neutral-100 bg-neutral-50 px-6 py-20 dark:border-neutral-900 dark:bg-neutral-950/50">
+      <section id="templates" className="relative border-t border-neutral-100 bg-neutral-50 px-6 py-20 dark:border-neutral-900 dark:bg-neutral-950/50">
         <motion.div className="mx-auto max-w-5xl" initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}>
           <motion.div variants={fadeUp}>
             <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between">
@@ -505,7 +489,7 @@ export default function HomePage() {
 
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {templates.map((tmpl) => (
-              <motion.div key={tmpl.name} variants={fadeUp} className="group relative overflow-hidden rounded border border-neutral-200 bg-white p-6 transition-all hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900/50 dark:hover:border-neutral-700">
+              <motion.div key={tmpl.name} variants={fadeUp} className="card-hover-glow group relative overflow-hidden rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900/50">
                 <div className="flex h-10 w-10 items-center justify-center rounded text-white" style={{ backgroundColor: tmpl.color }}>
                   <tmpl.icon className="h-5 w-5" />
                 </div>
@@ -513,7 +497,7 @@ export default function HomePage() {
                 <p className="mt-1 text-xs text-neutral-500">{tmpl.desc}</p>
                 <div className="mt-4 flex items-center gap-1.5">
                   <div className="h-1 flex-1 rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <div className="h-1 rounded-full" style={{ width: `${(tmpl.fields / 19) * 100}%`, backgroundColor: tmpl.color }} />
+                    <div className="h-1 rounded-full transition-all duration-500 group-hover:brightness-125" style={{ width: `${(tmpl.fields / 19) * 100}%`, backgroundColor: tmpl.color }} />
                   </div>
                   <span className="text-[10px] font-semibold text-neutral-400">{tmpl.fields} fields</span>
                 </div>
@@ -523,30 +507,39 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* ── Features ── */}
-      <section id="features" className="border-t border-neutral-100 px-6 py-20 dark:border-neutral-900">
-        <motion.div className="mx-auto max-w-5xl" initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}>
+      {/* ── Features — Orbital Timeline ── */}
+      <section id="features" className="relative border-t border-neutral-100 px-6 py-20 dark:border-neutral-900 overflow-hidden">
+        <AnimatedGridBackground color="#06b6d4" maxLights={2} gridSize={56} />
+        <motion.div
+          className="relative mx-auto max-w-5xl"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-80px' }}
+          variants={stagger}
+        >
           <motion.div variants={fadeUp} className="text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-600">Features</p>
             <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight">Everything you need, nothing you don&apos;t</h2>
+            <p className="mt-2 text-sm text-neutral-500">Click any node to explore. The orbit never stops.</p>
           </motion.div>
 
-          <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((feature, i) => (
-              <motion.div key={feature.title} variants={fadeUp} className="rounded border border-neutral-200 bg-white p-5 transition-all hover:border-neutral-300 dark:border-neutral-800 dark:bg-neutral-900/50 dark:hover:border-neutral-700">
-                <div className="flex h-9 w-9 items-center justify-center rounded bg-neutral-100 dark:bg-neutral-800">
-                  <feature.icon className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                </div>
-                <h3 className="mt-3 text-[13px] font-bold">{feature.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-neutral-500">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
+          <motion.div variants={fadeUp}>
+            <RadialOrbitalTimeline
+              timelineData={features.map((f, i) => ({
+                id: i + 1,
+                title: f.title,
+                content: f.desc,
+                icon: f.icon,
+                status: i < 3 ? 'completed' as const : i < 6 ? 'in-progress' as const : 'pending' as const,
+                energy: Math.max(40, 100 - i * 8),
+              }))}
+            />
+          </motion.div>
         </motion.div>
       </section>
 
       {/* ── Testimonials ── */}
-      <section id="__testimonials" className="border-t border-neutral-100 bg-neutral-50 px-6 py-20 dark:border-neutral-900 dark:bg-neutral-950/50">
+      <section id="__testimonials" className="relative border-t border-neutral-100 bg-neutral-50 px-6 py-20 dark:border-neutral-900 dark:bg-neutral-950/50">
         <motion.div className="mx-auto max-w-5xl" initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} variants={stagger}>
           <motion.div variants={fadeUp} className="text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-600">Testimonials</p>
@@ -555,7 +548,7 @@ export default function HomePage() {
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {testimonials.map((t) => (
-              <motion.div key={t.name} variants={fadeUp} className="rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900/50">
+              <motion.div key={t.name} variants={fadeUp} className="card-hover-glow rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900/50">
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
@@ -580,7 +573,7 @@ export default function HomePage() {
       {/* ── CTA ── */}
       <section id="__cta" className="relative overflow-hidden border-t border-neutral-100 px-6 py-24 dark:border-neutral-900">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 via-cyan-700 to-teal-700" />
-        <div className="dot-grid absolute inset-0 opacity-20" />
+        <AnimatedGridBackground color="#ffffff" maxLights={4} gridSize={56} showDots={false} className="opacity-20" />
         <motion.div className="relative mx-auto max-w-2xl text-center" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
           <motion.h2 variants={fadeUp} className="font-[family-name:var(--font-display)] text-3xl font-bold text-white sm:text-4xl">
             Ready to streamline<br />your intake?

@@ -30,8 +30,12 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         profile={profile as Profile}
         unreadCount={unreadCount || 0}
       />
-      <main className="flex-1 overflow-y-auto">
-        {children}
+      <main className="relative flex-1 overflow-y-auto">
+        {/* Subtle dot pattern on dashboard area */}
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.015)_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <div className="relative">
+          {children}
+        </div>
       </main>
     </div>
   )

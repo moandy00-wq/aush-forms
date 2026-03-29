@@ -8,14 +8,14 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const lenis = new Lenis({
-      lerp: 0.06,
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      wheelMultiplier: 0.8,
+      wheelMultiplier: 0.9,
       touchMultiplier: 1.5,
     })
 
     lenisRef.current = lenis
-    // Expose Lenis globally for GuidedTour to use
     ;(window as unknown as { __lenis: Lenis }).__lenis = lenis
 
     function raf(time: number) {
@@ -25,7 +25,6 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
 
     requestAnimationFrame(raf)
 
-    // Handle anchor link clicks for smooth scrolling to sections
     function handleClick(e: MouseEvent) {
       const target = e.target as HTMLElement
       const anchor = target.closest('a[href^="#"]') as HTMLAnchorElement | null
@@ -38,7 +37,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       if (!el) return
 
       e.preventDefault()
-      lenis.scrollTo(el as HTMLElement, { offset: -80, duration: 1.5 })
+      lenis.scrollTo(el as HTMLElement, { offset: -80, duration: 1.4 })
     }
 
     document.addEventListener('click', handleClick)

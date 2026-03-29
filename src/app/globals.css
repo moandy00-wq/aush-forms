@@ -17,36 +17,31 @@
   --color-cyan-950: #083344;
 }
 
-/* Lenis handles smooth scrolling */
-
-/* Dot grid pattern */
+/* ── Animated grid (CSS fallback for non-canvas areas) ── */
 .dot-grid {
   background-image: radial-gradient(circle, rgba(6, 182, 212, 0.08) 1px, transparent 1px);
   background-size: 24px 24px;
 }
-
 .dark .dot-grid {
   background-image: radial-gradient(circle, rgba(6, 182, 212, 0.04) 1px, transparent 1px);
 }
 
-/* Glassmorphism card */
+/* ── Glassmorphism ── */
 .glass-card {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
-
 .dark .glass-card {
   background: rgba(23, 23, 23, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Gradient border effect */
+/* ── Gradient border ── */
 .gradient-border {
   position: relative;
 }
-
 .gradient-border::before {
   content: "";
   position: absolute;
@@ -60,49 +55,66 @@
   pointer-events: none;
 }
 
-/* Animated glow for active elements */
+/* ── Glow effects ── */
 @keyframes subtle-pulse {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 0.8; }
+}
+@keyframes glow-line {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
 .glow-ring {
   box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.1), 0 0 20px rgba(6, 182, 212, 0.05);
 }
-
 .dark .glow-ring {
   box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.15), 0 0 30px rgba(6, 182, 212, 0.03);
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
+/* ── Card hover glow ── */
+.card-hover-glow {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.card-hover-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(6, 182, 212, 0.06), transparent 40%);
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+.card-hover-glow:hover::after {
+  opacity: 1;
+}
+.card-hover-glow:hover {
+  border-color: rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.04);
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* ── Shimmer line (for buttons, CTAs) ── */
+.shimmer-line::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  animation: glow-line 3s ease-in-out infinite;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #404040;
-  border-radius: 3px;
-}
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #404040; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #525252; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #525252;
-}
+/* ── Input reset ── */
+input:focus, select:focus, textarea:focus { outline: none; }
+input[type="file"] { display: none; }
 
-/* Input focus ring */
-input:focus, select:focus, textarea:focus {
-  outline: none;
-}
-
-/* File input hidden */
-input[type="file"] {
-  display: none;
-}
-
-/* Noise texture overlay */
+/* ── Noise texture ── */
 .noise-overlay::after {
   content: "";
   position: absolute;
@@ -112,17 +124,52 @@ input[type="file"] {
   border-radius: inherit;
 }
 
-/* Mesh gradient backgrounds */
+/* ── Mesh gradients ── */
 .mesh-gradient-1 {
   background:
     radial-gradient(ellipse at 20% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(20, 184, 166, 0.06) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
 }
-
 .dark .mesh-gradient-1 {
   background:
     radial-gradient(ellipse at 20% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 50%),
     radial-gradient(ellipse at 80% 20%, rgba(20, 184, 166, 0.03) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 80%, rgba(6, 182, 212, 0.02) 0%, transparent 50%);
+}
+
+/* ── Animated gradient text ── */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animated-gradient-text {
+  background-size: 200% auto;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* ── Sidebar active indicator ── */
+.sidebar-active-glow {
+  box-shadow: inset 3px 0 0 0 #06b6d4, 0 0 12px rgba(6, 182, 212, 0.08);
+}
+
+/* ── Stat card shine ── */
+@keyframes card-shine {
+  0% { transform: translateX(-100%) rotate(12deg); }
+  100% { transform: translateX(200%) rotate(12deg); }
+}
+.stat-card-shine::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 60%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+  transform: translateX(-100%) rotate(12deg);
+  pointer-events: none;
+}
+.stat-card-shine:hover::after {
+  animation: card-shine 0.8s ease-out;
 }

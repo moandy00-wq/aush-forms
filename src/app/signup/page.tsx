@@ -5,6 +5,8 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, UserPlus, Loader2, Check } from 'lucide-react'
+import { AnimatedGridBackground } from '@/components/ui/AnimatedGridBackground'
+import { FloatingShapes } from '@/components/ui/FloatingShapes'
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
@@ -69,7 +71,9 @@ export default function SignupPage() {
         variants={slideIn}
         className="relative hidden w-[45%] overflow-hidden bg-gradient-to-br from-cyan-950 via-[#0a1628] to-neutral-950 lg:flex lg:flex-col lg:justify-between"
       >
-        <div className="dot-grid absolute inset-0 opacity-60" />
+        <AnimatedGridBackground color="#06b6d4" maxLights={3} gridSize={40} />
+        <FloatingShapes />
+
         <div className="relative z-10 p-10">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded bg-cyan-500">
@@ -94,10 +98,16 @@ export default function SignupPage() {
 
           {/* Feature pills */}
           <div className="mt-10 flex flex-wrap gap-2">
-            {['OCR Auto-Fill', '4 Templates', 'PDF Export', 'Multi-Language', 'Dark Mode', 'Mobile Ready'].map((feature) => (
-              <div key={feature} className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-neutral-300">
+            {['OCR Auto-Fill', '4 Templates', 'PDF Export', 'Multi-Language', 'Dark Mode', 'Mobile Ready'].map((feature, i) => (
+              <motion.div
+                key={feature}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3, delay: 0.6 + i * 0.08 }}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] font-medium text-neutral-300 backdrop-blur-sm"
+              >
                 {feature}
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -157,7 +167,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* Password checks */}
             <div className="space-y-1.5">
               {passwordChecks.map((check) => (
                 <div key={check.label} className="flex items-center gap-2">
@@ -182,9 +191,9 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-sm bg-cyan-600 py-3 text-sm font-semibold text-white transition-all hover:bg-cyan-500 disabled:opacity-50"
+              className="shimmer-line relative w-full overflow-hidden rounded-sm bg-cyan-600 py-3 text-sm font-semibold text-white transition-all hover:bg-cyan-500 disabled:opacity-50"
             >
-              <span className="flex items-center justify-center gap-2">
+              <span className="relative z-10 flex items-center justify-center gap-2">
                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {loading ? 'Creating account...' : 'Create Account'}
               </span>

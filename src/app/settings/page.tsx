@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { templates } from '@/lib/templates'
 import type { Profile, FieldConfig } from '@/lib/types'
 import { Check, Palette, Save } from 'lucide-react'
 
@@ -96,14 +95,14 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="px-8 py-8">
+    <div className="px-4 sm:px-8 py-6 sm:py-8">
       <div className="max-w-2xl">
         <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold text-neutral-950 dark:text-white">Settings</h1>
         <p className="mt-1 text-sm text-neutral-500">Manage your business profile and form configuration.</p>
 
         <div className="mt-8 space-y-6">
           {/* Business Info */}
-          <div className="rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="card-hover-glow rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <h2 className="text-sm font-semibold text-neutral-950 dark:text-white">Business Information</h2>
             <div className="mt-4 space-y-4">
               <div>
@@ -140,7 +139,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Branding */}
-          <div className="rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="card-hover-glow rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <h2 className="flex items-center gap-2 text-sm font-semibold text-neutral-950 dark:text-white">
               <Palette className="h-4 w-4" />
               Brand Color
@@ -150,8 +149,8 @@ export default function SettingsPage() {
                 <button
                   key={color}
                   onClick={() => setBrandColor(color)}
-                  className={`h-8 w-8 rounded-full transition-all ${
-                    brandColor === color ? 'ring-2 ring-offset-2 ring-neutral-400 dark:ring-offset-neutral-900' : ''
+                  className={`h-8 w-8 rounded-full transition-all duration-150 ${
+                    brandColor === color ? 'ring-2 ring-offset-2 ring-neutral-400 scale-110 dark:ring-offset-neutral-900' : 'hover:scale-105'
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -160,12 +159,12 @@ export default function SettingsPage() {
           </div>
 
           {/* Field Config */}
-          <div className="rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="card-hover-glow rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <h2 className="text-sm font-semibold text-neutral-950 dark:text-white">Form Fields</h2>
             <p className="mt-1 text-xs text-neutral-500">Toggle fields on/off and set required status.</p>
             <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
               {Object.entries(fieldConfig).map(([field, config]) => (
-                <div key={field} className="flex items-center justify-between rounded-sm px-2 py-1.5 hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                <div key={field} className="flex items-center justify-between rounded-sm px-2 py-1.5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleField(field)}
@@ -200,10 +199,10 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 rounded-sm bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-cyan-500 disabled:opacity-50"
+            className="shimmer-line relative flex items-center gap-2 overflow-hidden rounded-sm bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-cyan-500 disabled:opacity-50"
           >
-            <Save className="h-4 w-4" />
-            {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
+            <Save className="relative z-10 h-4 w-4" />
+            <span className="relative z-10">{saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}</span>
           </button>
         </div>
       </div>

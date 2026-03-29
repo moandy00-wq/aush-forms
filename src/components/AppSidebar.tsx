@@ -36,9 +36,12 @@ export function AppSidebar({ profile, unreadCount }: AppSidebarProps) {
   ]
 
   return (
-    <aside className="flex w-[260px] flex-col border-r border-neutral-200 bg-neutral-50 dark:border-neutral-800/50 dark:bg-[#0d0d0d]">
+    <aside className="relative hidden md:flex w-[260px] flex-col border-r border-neutral-200 bg-neutral-50 dark:border-neutral-800/50 dark:bg-[#0d0d0d]">
+      {/* Subtle grid overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.02)_1px,transparent_1px)] bg-[size:32px_32px]" />
+
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 py-5">
+      <div className="relative flex items-center gap-3 px-5 py-5">
         <div className="flex h-9 w-9 items-center justify-center rounded" style={{ backgroundColor: profile.brand_color || '#0891b2' }}>
           <span className="text-sm font-bold text-white">{profile.business_name?.charAt(0) || 'A'}</span>
         </div>
@@ -51,7 +54,7 @@ export function AppSidebar({ profile, unreadCount }: AppSidebarProps) {
       <div className="mx-5 h-px bg-neutral-200 dark:bg-neutral-800/50" />
 
       {/* Nav */}
-      <nav className="flex-1 space-y-0.5 px-3 py-4">
+      <nav className="relative flex-1 space-y-0.5 px-3 py-4">
         <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400">Menu</p>
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
@@ -59,13 +62,13 @@ export function AppSidebar({ profile, unreadCount }: AppSidebarProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded px-3 py-2.5 text-[13px] font-medium transition-all ${
+              className={`group flex items-center gap-3 rounded px-3 py-2.5 text-[13px] font-medium transition-all duration-150 ${
                 isActive
-                  ? 'bg-white text-neutral-950 shadow-sm dark:bg-neutral-800 dark:text-white'
+                  ? 'sidebar-active-glow bg-white text-neutral-950 dark:bg-neutral-800 dark:text-white'
                   : 'text-neutral-500 hover:bg-white hover:text-neutral-900 dark:hover:bg-neutral-800/50 dark:hover:text-white'
               }`}
             >
-              <item.icon className="h-4 w-4" />
+              <item.icon className={`h-4 w-4 transition-colors ${isActive ? 'text-cyan-500' : 'group-hover:text-cyan-500/60'}`} />
               <span className="flex-1">{item.label}</span>
               {item.badge ? (
                 <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-cyan-600 px-1.5 text-[10px] font-bold text-white">
@@ -82,22 +85,20 @@ export function AppSidebar({ profile, unreadCount }: AppSidebarProps) {
 
         <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-400">Quick Links</p>
 
-        {/* Public link */}
         <a
           href={`/f/${profile.slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 rounded px-3 py-2.5 text-[13px] font-medium text-neutral-500 transition-all hover:bg-white hover:text-neutral-900 dark:hover:bg-neutral-800/50 dark:hover:text-white"
+          className="group flex items-center gap-3 rounded px-3 py-2.5 text-[13px] font-medium text-neutral-500 transition-all hover:bg-white hover:text-neutral-900 dark:hover:bg-neutral-800/50 dark:hover:text-white"
         >
-          <ExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4 group-hover:text-cyan-500/60 transition-colors" />
           <span className="flex-1">Public Form</span>
         </a>
       </nav>
 
       {/* Footer */}
-      <div className="space-y-2 px-3 pb-4">
-        {/* Shareable link pill */}
-        <div className="rounded border border-neutral-200 bg-white px-3 py-2.5 dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="relative space-y-2 px-3 pb-4">
+        <div className="gradient-border rounded border border-neutral-200 bg-white px-3 py-2.5 dark:border-neutral-800 dark:bg-neutral-900">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Your Form Link</p>
           <p className="mt-0.5 truncate font-mono text-xs font-semibold text-cyan-600 dark:text-cyan-400">/f/{profile.slug}</p>
         </div>
