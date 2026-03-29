@@ -48,6 +48,8 @@ export function FormWizard({ profile }: FormWizardProps) {
     mode: 'onTouched',
   })
 
+  const [missingFields, setMissingFields] = useState<string[]>([])
+
   const steps = template.steps
 
   // Step validation field maps
@@ -58,17 +60,11 @@ export function FormWizard({ profile }: FormWizardProps) {
     return step.fields.filter((f) => fieldConfig[f]?.enabled && fieldConfig[f]?.required)
   }
 
-  const goNext = useCallback(async () => {
-    const stepFields = getStepFields(steps[currentStep].id)
-
-    if (stepFields.length > 0) {
-      const isValid = await methods.trigger(stepFields as (keyof IntakeFormData)[])
-      if (!isValid) return
-    }
-
+  const goNext = useCallback(() => {
+    setMissingFields([])
     setDirection(1)
     setCurrentStep((s) => Math.min(s + 1, steps.length - 1))
-  }, [currentStep, steps, methods])
+  }, [steps])
 
   const goBack = useCallback(() => {
     setDirection(-1)
@@ -81,10 +77,31 @@ export function FormWizard({ profile }: FormWizardProps) {
   }, [currentStep])
 
   const handleSubmit = useCallback(async () => {
+    // Check all required fields across all steps before submitting
+    const formData = methods.getValues()
+    const missing: string[] = []
+
+    for (const step of steps) {
+      for (const field of step.fields) {
+        if (fieldConfig[field]?.enabled && fieldConfig[field]?.required) {
+          const value = formData[field as keyof IntakeFormData]
+          if (!value || !value.trim()) {
+            // Format field name for display: "firstName" → "First Name"
+            missing.push(field.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()))
+          }
+        }
+      }
+    }
+
+    if (missing.length > 0) {
+      setMissingFields(missing)
+      return
+    }
+
+    setMissingFields([])
     setSubmitting(true)
 
     try {
-      const formData = methods.getValues()
       const supabase = createClient()
 
       // Upload files to Supabase Storage
@@ -295,6 +312,18 @@ export function FormWizard({ profile }: FormWizardProps) {
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* Missing fields warning */}
+        {missingFields.length > 0 && (
+          <div className="mt-6 rounded border border-rose-500/20 bg-rose-500/5 p-4">
+            <p className="text-sm font-semibold text-rose-500">Please fill out the following required fields:</p>
+            <ul className="mt-2 space-y-1">
+              {missingFields.map((f) => (
+                <li key={f} className="text-xs text-rose-400">• {f}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="mt-8 flex items-center justify-between">

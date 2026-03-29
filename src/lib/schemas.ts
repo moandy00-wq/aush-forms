@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 export const personalInfoSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
+  middleName: z.string().optional().or(z.literal('')),
   lastName: z.string().min(1, 'Last name is required'),
   dateOfBirth: z.string().min(1, 'Date of birth is required'),
   ssnLast4: z.string().regex(/^\d{4}$/, 'Must be exactly 4 digits').or(z.literal('')).optional(),
@@ -15,9 +16,47 @@ export const personalInfoSchema = z.object({
   city: z.string().min(1, 'City is required'),
   state: z.string().min(1, 'State is required'),
   zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid zip code'),
-  // Medical-specific
   emergencyContactName: z.string().optional().or(z.literal('')),
   emergencyContactPhone: z.string().optional().or(z.literal('')),
+})
+
+// Combined schema for all form fields — used as the resolver
+export const intakeFormSchema = z.object({
+  // Personal
+  firstName: z.string().min(1, 'First name is required'),
+  middleName: z.string().optional().or(z.literal('')),
+  lastName: z.string().min(1, 'Last name is required'),
+  dateOfBirth: z.string().min(1, 'Date of birth is required'),
+  ssnLast4: z.string().regex(/^\d{4}$/, 'Must be exactly 4 digits').or(z.literal('')).optional(),
+  email: z.string().email('Invalid email address').or(z.literal('')).optional(),
+  phone: z.string().min(10, 'At least 10 digits').or(z.literal('')).optional(),
+  address: z.string().min(1, 'Address is required'),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(1, 'State is required'),
+  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid zip code').or(z.literal('')).optional(),
+  emergencyContactName: z.string().optional().or(z.literal('')),
+  emergencyContactPhone: z.string().optional().or(z.literal('')),
+  // Employment
+  employerName: z.string().optional().or(z.literal('')),
+  jobTitle: z.string().optional().or(z.literal('')),
+  annualIncome: z.string().optional().or(z.literal('')),
+  employmentStatus: z.string().optional().or(z.literal('')),
+  yearsEmployed: z.string().optional().or(z.literal('')),
+  // Medical
+  primaryCarePhysician: z.string().optional().or(z.literal('')),
+  allergies: z.string().optional().or(z.literal('')),
+  currentMedications: z.string().optional().or(z.literal('')),
+  medicalConditions: z.string().optional().or(z.literal('')),
+  // Legal
+  caseType: z.string().optional().or(z.literal('')),
+  opposingParty: z.string().optional().or(z.literal('')),
+  caseDescription: z.string().optional().or(z.literal('')),
+  urgencyLevel: z.string().optional().or(z.literal('')),
+  // Additional
+  reasonForVisit: z.string().optional().or(z.literal('')),
+  referralSource: z.string().optional().or(z.literal('')),
+  preferredContact: z.string().optional().or(z.literal('')),
+  notes: z.string().optional().or(z.literal('')),
 })
 
 export const employmentSchema = z.object({
