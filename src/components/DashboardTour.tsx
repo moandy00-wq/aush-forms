@@ -177,15 +177,6 @@ export function DashboardTour({ slug }: DashboardTourProps) {
       {/* ── Active tour ── */}
       {active && (
         <>
-          {/* Dim overlay — covers everything, highlight punches through via z-index on original element */}
-          <div
-            className="fixed inset-0 z-[155] pointer-events-none"
-            style={{
-              backgroundColor: dimmed ? 'rgba(0,0,0,0.6)' : 'transparent',
-              transition: 'background-color 0.6s ease',
-            }}
-          />
-
           {/* Progress */}
           <div className="fixed left-0 right-0 top-0 z-[201] h-1 bg-neutral-900">
             <div className="h-full bg-gradient-to-r from-cyan-500 to-teal-400" style={{ width: `${((currentStep + 1) / steps.length) * 100}%`, transition: 'width 0.5s ease' }} />
@@ -194,7 +185,7 @@ export function DashboardTour({ slug }: DashboardTourProps) {
           {/* Skip */}
           <button onClick={endTour} className="fixed right-6 top-5 z-[201] rounded-full border border-neutral-700 bg-neutral-900/80 px-3 py-1.5 text-[11px] font-medium text-neutral-400 backdrop-blur-sm hover:text-white">Skip Tour</button>
 
-          {/* Highlight border — positioned exactly over the target element */}
+          {/* Highlight — border + massive box-shadow dims everything EXCEPT the highlighted area */}
           {highlight && (
             <div
               className="fixed z-[160] pointer-events-none rounded"
@@ -205,10 +196,12 @@ export function DashboardTour({ slug }: DashboardTourProps) {
                 height: highlight.height + 8,
                 border: '2px solid',
                 borderColor: borderVisible ? 'rgba(6,182,212,0.7)' : 'rgba(6,182,212,0)',
-                boxShadow: borderVisible
-                  ? '0 0 20px rgba(6,182,212,0.15), inset 0 0 20px rgba(6,182,212,0.03)'
+                boxShadow: dimmed
+                  ? '0 0 0 9999px rgba(0,0,0,0.65), 0 0 30px rgba(6,182,212,0.15)'
+                  : borderVisible
+                  ? '0 0 20px rgba(6,182,212,0.15)'
                   : 'none',
-                transition: 'border-color 0.8s ease, box-shadow 0.8s ease, opacity 0.5s ease',
+                transition: 'border-color 0.8s ease, box-shadow 0.6s ease',
               }}
             />
           )}
