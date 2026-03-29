@@ -48,8 +48,8 @@ export function DashboardTour({ slug }: DashboardTourProps) {
   const [showIntro, setShowIntro] = useState(false)
   const [showFinale, setShowFinale] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [clonedHtml, setClonedHtml] = useState('')
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const prevElRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (localStorage.getItem(TOUR_KEY)) return
@@ -66,62 +66,36 @@ export function DashboardTour({ slug }: DashboardTourProps) {
     setTimeout(() => advanceToStep(0), 600)
   }, [])
 
-  function highlightElement(step: TourStep) {
-    // Reset previous element
-    if (prevElRef.current) {
-      prevElRef.current.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease, z-index 0s 0.5s'
-      prevElRef.current.style.transform = ''
-      prevElRef.current.style.boxShadow = ''
-      prevElRef.current.style.zIndex = ''
-      prevElRef.current.style.position = ''
-    }
-
-    const el = document.querySelector(step.targetSelector) as HTMLElement | null
-    if (!el) return
-
-    prevElRef.current = el
-
-    // Pop out effect: scale up + lift with shadow + high z-index
-    el.style.position = 'relative'
-    el.style.zIndex = '160'
-    el.style.transition = 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease'
-
-    requestAnimationFrame(() => {
-      el.style.transform = 'scale(1.08) translateY(-8px)'
-      el.style.boxShadow = '0 20px 60px rgba(6, 182, 212, 0.15), 0 8px 24px rgba(0, 0, 0, 0.4)'
-    })
-  }
-
-  function resetHighlight() {
-    if (prevElRef.current) {
-      prevElRef.current.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease'
-      prevElRef.current.style.transform = ''
-      prevElRef.current.style.boxShadow = ''
-      prevElRef.current.style.zIndex = ''
-      prevElRef.current.style.position = ''
-      prevElRef.current = null
-    }
+  function captureElement(selector: string) {
+    const el = document.querySelector(selector) as HTMLElement | null
+    if (!el) { setClonedHtml(''); return }
+    setClonedHtml(el.outerHTML)
   }
 
   function advanceToStep(stepIndex: number) {
     if (stepIndex >= steps.length) {
       setCurrentStep(-1)
-      resetHighlight()
+      setClonedHtml('')
       setTimeout(() => {
         setActive(false)
         setShowFinale(true)
-      }, 500)
+      }, 400)
       return
     }
 
-    // Brief reset between steps
-    if (currentStep >= 0) resetHighlight()
-
-    setTimeout(() => {
+    // Brief gap between steps
+    if (stepIndex > 0) {
+      setClonedHtml('')
+      setTimeout(() => {
+        setCurrentStep(stepIndex)
+        captureElement(steps[stepIndex]!.targetSelector)
+        timerRef.current = setTimeout(() => advanceToStep(stepIndex + 1), steps[stepIndex]!.delay)
+      }, 300)
+    } else {
       setCurrentStep(stepIndex)
-      highlightElement(steps[stepIndex]!)
+      captureElement(steps[stepIndex]!.targetSelector)
       timerRef.current = setTimeout(() => advanceToStep(stepIndex + 1), steps[stepIndex]!.delay)
-    }, currentStep >= 0 ? 300 : 0)
+    }
   }
 
   const handleNext = useCallback(() => {
@@ -135,7 +109,7 @@ export function DashboardTour({ slug }: DashboardTourProps) {
     setShowIntro(false)
     setShowFinale(false)
     setCurrentStep(-1)
-    resetHighlight()
+    setClonedHtml('')
     localStorage.setItem(TOUR_KEY, 'true')
   }, [])
 
@@ -176,7 +150,6 @@ export function DashboardTour({ slug }: DashboardTourProps) {
               >
                 <LayoutDashboard className="h-8 w-8 text-white" />
               </motion.div>
-
               <motion.h2
                 className="mt-6 font-[family-name:var(--font-display)] text-2xl font-bold text-white"
                 initial={{ opacity: 0, y: 10 }}
@@ -193,7 +166,6 @@ export function DashboardTour({ slug }: DashboardTourProps) {
               >
                 Let me give you a quick walkthrough of everything at your fingertips. This&apos;ll take about 15 seconds.
               </motion.p>
-
               <motion.button
                 onClick={startTour}
                 className="shimmer-line relative mt-8 inline-flex items-center gap-2.5 overflow-hidden rounded-sm bg-gradient-to-r from-cyan-600 to-teal-600 px-8 py-4 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-cyan-500/20"
@@ -209,56 +181,67 @@ export function DashboardTour({ slug }: DashboardTourProps) {
         )}
       </AnimatePresence>
 
-      {/* ── Active tour overlay ── */}
+      {/* ── Active tour: blurred bg + cloned element centered ── */}
       <AnimatePresence>
         {active && (
-          <>
-            {/* Darkened backdrop — highlighted element pops above this */}
-            <motion.div
-              className="fixed inset-0 z-[155] bg-black/50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            />
+          <motion.div
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-lg" />
 
             {/* Progress */}
-            <motion.div
-              className="fixed left-0 right-0 top-0 z-[201] h-1 bg-neutral-900"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
+            <div className="absolute left-0 right-0 top-0 z-10 h-1 bg-neutral-900">
               <motion.div
                 className="h-full bg-gradient-to-r from-cyan-500 to-teal-400"
                 animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
                 transition={{ duration: 0.5 }}
               />
-            </motion.div>
+            </div>
 
             {/* Skip */}
-            <motion.button
+            <button
               onClick={endTour}
-              className="fixed right-6 top-5 z-[201] rounded-full border border-neutral-700 bg-neutral-900/90 px-3 py-1.5 text-[11px] font-medium text-neutral-400 backdrop-blur-sm transition-all hover:text-white"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              className="absolute right-6 top-5 z-10 rounded-full border border-neutral-700 bg-neutral-900/80 px-3 py-1.5 text-[11px] font-medium text-neutral-400 transition-all hover:text-white"
             >
               Skip Tour
-            </motion.button>
+            </button>
 
-            {/* Tour card */}
+            {/* Cloned element display */}
+            <AnimatePresence mode="wait">
+              {clonedHtml && (
+                <motion.div
+                  key={currentStep}
+                  className="relative z-10 mx-6 w-full max-w-3xl"
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {/* Cloned element rendered as static snapshot */}
+                  <div
+                    className="rounded border border-cyan-500/20 bg-[#0d0d0d] p-4 sm:p-6 shadow-2xl shadow-cyan-500/5 pointer-events-none"
+                    dangerouslySetInnerHTML={{ __html: clonedHtml }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Tour description card */}
             <AnimatePresence mode="wait">
               {step && (
                 <motion.div
-                  key={currentStep}
-                  className="fixed bottom-8 left-1/2 z-[201] w-full max-w-md -translate-x-1/2 px-6"
-                  initial={{ opacity: 0, y: 40 }}
+                  key={`desc-${currentStep}`}
+                  className="relative z-10 mx-6 mt-6 w-full max-w-lg"
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 30 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.4, delay: 0.15 }}
                 >
-                  <div className="overflow-hidden rounded border border-neutral-800 bg-[#0d0d0d]/95 shadow-2xl backdrop-blur-xl">
+                  <div className="overflow-hidden rounded border border-neutral-800 bg-[#0d0d0d]/95 backdrop-blur-xl">
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
                     <div className="p-5">
                       <div className="flex items-start gap-3">
@@ -266,14 +249,11 @@ export function DashboardTour({ slug }: DashboardTourProps) {
                           <step.icon className="h-4 w-4 text-cyan-400" />
                         </div>
                         <div className="flex-1">
-                          <span className="text-[10px] font-bold text-cyan-400">
-                            {currentStep + 1} / {steps.length}
-                          </span>
+                          <span className="text-[10px] font-bold text-cyan-400">{currentStep + 1} / {steps.length}</span>
                           <h3 className="mt-1 font-[family-name:var(--font-display)] text-base font-bold text-white">{step.title}</h3>
                           <p className="mt-1.5 text-sm leading-relaxed text-neutral-400">{step.description}</p>
                         </div>
                       </div>
-
                       <div className="mt-4 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           {steps.map((_, i) => (
@@ -298,11 +278,11 @@ export function DashboardTour({ slug }: DashboardTourProps) {
                 </motion.div>
               )}
             </AnimatePresence>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── Finale — Share your link ── */}
+      {/* ── Finale ── */}
       <AnimatePresence>
         {showFinale && (
           <motion.div
@@ -321,7 +301,6 @@ export function DashboardTour({ slug }: DashboardTourProps) {
               transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="h-1 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-500" />
-
               <div className="p-8 sm:p-10 text-center">
                 <motion.div
                   className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-teal-500"
@@ -331,7 +310,6 @@ export function DashboardTour({ slug }: DashboardTourProps) {
                 >
                   <Share2 className="h-8 w-8 text-white" />
                 </motion.div>
-
                 <motion.h2
                   className="mt-6 font-[family-name:var(--font-display)] text-2xl font-bold text-white"
                   initial={{ opacity: 0, y: 10 }}
@@ -348,7 +326,6 @@ export function DashboardTour({ slug }: DashboardTourProps) {
                 >
                   Share your form link with clients to start receiving submissions. Drop it in an email, text, or embed it on your website.
                 </motion.p>
-
                 <motion.div
                   className="mt-6 flex items-center gap-2 rounded border border-neutral-800 bg-neutral-900 px-4 py-3"
                   initial={{ opacity: 0, y: 10 }}
@@ -365,7 +342,6 @@ export function DashboardTour({ slug }: DashboardTourProps) {
                     {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5 text-neutral-400" />}
                   </button>
                 </motion.div>
-
                 <motion.div
                   className="mt-6 flex flex-col gap-3"
                   initial={{ opacity: 0, y: 10 }}
