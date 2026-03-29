@@ -33,7 +33,7 @@ export function FormField({
   const error = errors[name]
   const errorMessage = error?.message as string | undefined
 
-  const baseClasses = `w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-neutral-400 dark:bg-neutral-800 dark:text-white ${
+  const baseClasses = `w-full rounded border bg-white px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-neutral-400 dark:bg-neutral-800 dark:text-white ${
     error
       ? 'border-rose-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
       : 'border-neutral-300 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700'

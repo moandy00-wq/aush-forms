@@ -71,7 +71,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
     if (activeFields.length === 0) return null
 
     return (
-      <div className="rounded-xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="rounded border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
         <div className="border-b border-neutral-200 px-5 py-3 dark:border-neutral-800">
           <h3 className="text-sm font-semibold text-neutral-950 dark:text-white">{title}</h3>
         </div>
@@ -102,7 +102,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
           <p className="mt-1 text-sm text-neutral-500">{date} &middot; {submission.template} template</p>
         </div>
         <div className="flex items-center gap-2">
-          <span className={`rounded-md px-2.5 py-1 text-xs font-medium ${
+          <span className={`rounded-sm px-2.5 py-1 text-xs font-medium ${
             submission.status === 'new'
               ? 'bg-cyan-50 text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-400'
               : submission.status === 'reviewed'
@@ -136,7 +136,7 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
           <h3 className="mb-3 text-sm font-semibold text-neutral-950 dark:text-white">Uploaded Documents</h3>
           <div className="grid grid-cols-2 gap-4">
             {documents.map((doc) => (
-              <div key={doc.id} className="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800">
+              <div key={doc.id} className="overflow-hidden rounded border border-neutral-200 dark:border-neutral-800">
                 <div className="aspect-[4/3] bg-neutral-100 dark:bg-neutral-800">
                   {doc.file_url && (
                     <img

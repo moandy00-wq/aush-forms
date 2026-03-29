@@ -184,7 +184,7 @@ export function FormWizard({ profile }: FormWizardProps) {
   if (submitted) {
     return (
       <div className="flex flex-col items-center py-12 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl" style={{ backgroundColor: profile.brand_color }}>
+        <div className="flex h-16 w-16 items-center justify-center rounded" style={{ backgroundColor: profile.brand_color }}>
           <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -196,7 +196,7 @@ export function FormWizard({ profile }: FormWizardProps) {
           {pdfBlob && (
             <button
               onClick={handleDownloadPdf}
-              className="flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white"
+              className="flex items-center gap-2 rounded-sm px-5 py-2.5 text-sm font-semibold text-white"
               style={{ backgroundColor: profile.brand_color }}
             >
               <Download className="h-4 w-4" />
@@ -207,7 +207,7 @@ export function FormWizard({ profile }: FormWizardProps) {
             onClick={() => {
               alert(`${t('success.emailSent')} ${methods.getValues('email')}`)
             }}
-            className="flex items-center gap-2 rounded-lg border border-neutral-200 px-5 py-2.5 text-sm font-semibold text-neutral-700 transition-all hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+            className="flex items-center gap-2 rounded-sm border border-neutral-200 px-5 py-2.5 text-sm font-semibold text-neutral-700 transition-all hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             <Mail className="h-4 w-4" />
             {t('wizard.emailPdf')}
@@ -312,7 +312,7 @@ export function FormWizard({ profile }: FormWizardProps) {
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-sm px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
               style={{ backgroundColor: profile.brand_color }}
             >
               <Send className="h-4 w-4" />
@@ -321,7 +321,7 @@ export function FormWizard({ profile }: FormWizardProps) {
           ) : (
             <button
               onClick={goNext}
-              className="flex items-center gap-2 rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+              className="flex items-center gap-2 rounded-sm bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
             >
               {t('wizard.next')}
               <ArrowRight className="h-4 w-4" />

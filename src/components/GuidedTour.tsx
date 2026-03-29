@@ -183,7 +183,7 @@ export function GuidedTour() {
             transition={{ duration: 0.4 }}
           >
             <motion.div
-              className="mx-6 w-full max-w-md overflow-hidden rounded-2xl border border-neutral-800 bg-[#111] shadow-2xl"
+              className="mx-6 w-full max-w-md overflow-hidden rounded border border-neutral-800 bg-[#111] shadow-2xl"
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -193,7 +193,7 @@ export function GuidedTour() {
               <div className="h-1 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-600" />
 
               <div className="p-8 text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-teal-500">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded bg-gradient-to-br from-cyan-500 to-teal-500">
                   <Sparkles className="h-7 w-7 text-white" />
                 </div>
 
@@ -207,14 +207,14 @@ export function GuidedTour() {
                 <div className="mt-7 flex flex-col gap-2.5">
                   <button
                     onClick={startTour}
-                    className="group flex w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 py-3.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-cyan-500/20"
+                    className="group flex w-full items-center justify-center gap-2.5 rounded-sm bg-gradient-to-r from-cyan-600 to-teal-600 py-3.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-cyan-500/20"
                   >
                     <Play className="h-4 w-4" />
                     Take the Tour
                   </button>
                   <button
                     onClick={dismissPrompt}
-                    className="w-full rounded-xl border border-neutral-800 py-3 text-sm font-medium text-neutral-500 transition-all hover:border-neutral-700 hover:text-neutral-300"
+                    className="w-full rounded-sm border border-neutral-800 py-3 text-sm font-medium text-neutral-500 transition-all hover:border-neutral-700 hover:text-neutral-300"
                   >
                     Skip, I&apos;ll explore myself
                   </button>
@@ -278,7 +278,7 @@ export function GuidedTour() {
                   exit={{ opacity: 0, y: 20 }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 >
-                  <div className="overflow-hidden rounded-2xl border border-neutral-800 bg-[#111]/95 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                  <div className="overflow-hidden rounded border border-neutral-800 bg-[#111]/95 shadow-2xl shadow-black/40 backdrop-blur-xl">
                     {/* Gradient accent */}
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
 
@@ -317,7 +317,7 @@ export function GuidedTour() {
                           <Link
                             href="/signup"
                             onClick={endTour}
-                            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-600 to-teal-600 px-5 py-2.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-cyan-500/20"
+                            className="flex items-center gap-2 rounded-sm bg-gradient-to-r from-cyan-600 to-teal-600 px-5 py-2.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-cyan-500/20"
                           >
                             Create Your Form
                             <ArrowRight className="h-3.5 w-3.5" />
@@ -325,7 +325,7 @@ export function GuidedTour() {
                         ) : (
                           <button
                             onClick={handleNext}
-                            className="flex items-center gap-1.5 rounded-lg bg-neutral-800 px-4 py-2 text-sm font-semibold text-neutral-300 transition-all hover:bg-neutral-700 hover:text-white"
+                            className="flex items-center gap-1.5 rounded-sm bg-neutral-800 px-4 py-2 text-sm font-semibold text-neutral-300 transition-all hover:bg-neutral-700 hover:text-white"
                           >
                             Next
                             <ArrowRight className="h-3.5 w-3.5" />

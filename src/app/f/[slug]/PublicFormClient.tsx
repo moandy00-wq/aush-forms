@@ -18,10 +18,10 @@ export function PublicFormClient({ profile }: Props) {
           <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
             <div className="flex items-center gap-2">
               {profile.business_logo_url ? (
-                <img src={profile.business_logo_url} alt="" className="h-8 w-8 rounded-lg object-cover" />
+                <img src={profile.business_logo_url} alt="" className="h-8 w-8 rounded object-cover" />
               ) : (
                 <div
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-white"
+                  className="flex h-8 w-8 items-center justify-center rounded text-white"
                   style={{ backgroundColor: profile.brand_color }}
                 >
                   <span className="text-sm font-bold">{profile.business_name.charAt(0)}</span>

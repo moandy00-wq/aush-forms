@@ -103,7 +103,7 @@ export default function SettingsPage() {
 
         <div className="mt-8 space-y-6">
           {/* Business Info */}
-          <div className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <h2 className="text-sm font-semibold text-neutral-950 dark:text-white">Business Information</h2>
             <div className="mt-4 space-y-4">
               <div>
@@ -112,7 +112,7 @@ export default function SettingsPage() {
                   type="text"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className="w-full rounded border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
               <div>
@@ -123,7 +123,7 @@ export default function SettingsPage() {
                     type="text"
                     value={slug}
                     onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                    className="flex-1 rounded-lg border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                    className="flex-1 rounded border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                   />
                 </div>
               </div>
@@ -133,14 +133,14 @@ export default function SettingsPage() {
                   type="email"
                   value={notificationEmail}
                   onChange={(e) => setNotificationEmail(e.target.value)}
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className="w-full rounded border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
             </div>
           </div>
 
           {/* Branding */}
-          <div className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <h2 className="flex items-center gap-2 text-sm font-semibold text-neutral-950 dark:text-white">
               <Palette className="h-4 w-4" />
               Brand Color
@@ -160,12 +160,12 @@ export default function SettingsPage() {
           </div>
 
           {/* Field Config */}
-          <div className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <h2 className="text-sm font-semibold text-neutral-950 dark:text-white">Form Fields</h2>
             <p className="mt-1 text-xs text-neutral-500">Toggle fields on/off and set required status.</p>
             <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
               {Object.entries(fieldConfig).map(([field, config]) => (
-                <div key={field} className="flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                <div key={field} className="flex items-center justify-between rounded-sm px-2 py-1.5 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleField(field)}
@@ -200,7 +200,7 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 rounded-lg bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-cyan-500 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-sm bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-cyan-500 disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}

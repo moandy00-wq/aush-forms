@@ -66,7 +66,7 @@ export function FileDropzone({
   // Show preview state
   if (preview && !isProcessing) {
     return (
-      <div className="relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+      <div className="relative overflow-hidden rounded border border-neutral-200 dark:border-neutral-700">
         <div className="relative aspect-[16/9] bg-neutral-100 dark:bg-neutral-800">
           <img src={preview} alt={label} className="h-full w-full object-cover" />
           {onClear && (
@@ -123,7 +123,7 @@ export function FileDropzone({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onClick={() => fileInputRef.current?.click()}
-        className={`relative flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed p-8 transition-all ${
+        className={`relative flex cursor-pointer flex-col items-center rounded border-2 border-dashed p-8 transition-all ${
           isDragging
             ? 'border-cyan-400 bg-cyan-50/50 dark:bg-cyan-500/5'
             : 'border-neutral-300 hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-600'
@@ -165,7 +165,7 @@ export function FileDropzone({
       {/* Camera button (mobile) */}
       <button
         onClick={() => cameraInputRef.current?.click()}
-        className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 py-2 text-sm text-neutral-600 transition-all hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
+        className="mt-2 flex w-full items-center justify-center gap-2 rounded border border-neutral-200 py-2 text-sm text-neutral-600 transition-all hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
       >
         <Camera className="h-4 w-4" />
         {t('upload.camera')}
@@ -181,7 +181,7 @@ export function FileDropzone({
 
       {/* Error */}
       {error && (
-        <p className="mt-2 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{error}</p>
+        <p className="mt-2 rounded bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{error}</p>
       )}
     </div>
   )

@@ -87,7 +87,7 @@ export function ReviewSubmit({ template, uploadedFiles, onEditStep }: ReviewSubm
         if (activeFields.length === 0) return null
 
         return (
-          <div key={section.titleKey} className="rounded-xl border border-neutral-200 dark:border-neutral-800">
+          <div key={section.titleKey} className="rounded border border-neutral-200 dark:border-neutral-800">
             <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-3 dark:border-neutral-800">
               <h3 className="text-sm font-semibold text-neutral-950 dark:text-white">{t(section.titleKey)}</h3>
               <button
@@ -113,13 +113,13 @@ export function ReviewSubmit({ template, uploadedFiles, onEditStep }: ReviewSubm
 
       {/* Uploaded documents */}
       {fileEntries.length > 0 && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800">
+        <div className="rounded border border-neutral-200 dark:border-neutral-800">
           <div className="border-b border-neutral-200 px-5 py-3 dark:border-neutral-800">
             <h3 className="text-sm font-semibold text-neutral-950 dark:text-white">{t('review.section.documents')}</h3>
           </div>
           <div className="grid grid-cols-2 gap-3 p-4">
             {fileEntries.map(([key, file]) => (
-              <div key={key} className="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
+              <div key={key} className="overflow-hidden rounded border border-neutral-200 dark:border-neutral-700">
                 <div className="aspect-[4/3] bg-neutral-100 dark:bg-neutral-800">
                   <img src={(file as UploadedFiles[keyof UploadedFiles])?.preview || ''} alt={key} className="h-full w-full object-cover" />
                 </div>

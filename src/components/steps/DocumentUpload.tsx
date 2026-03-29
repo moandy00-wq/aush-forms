@@ -59,7 +59,7 @@ export function DocumentUpload({ documentTypes, files, onFileChange }: DocumentU
 
   if (additionalDocs.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-neutral-300 p-8 text-center dark:border-neutral-700">
+      <div className="rounded border border-dashed border-neutral-300 p-8 text-center dark:border-neutral-700">
         <p className="text-sm text-neutral-500">{t('steps.documents.description')}</p>
         <p className="mt-1 text-xs text-neutral-400">No additional documents required for this template.</p>
       </div>
@@ -68,7 +68,7 @@ export function DocumentUpload({ documentTypes, files, onFileChange }: DocumentU
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg bg-amber-50 px-4 py-3 dark:bg-amber-500/5">
+      <div className="rounded bg-amber-50 px-4 py-3 dark:bg-amber-500/5">
         <p className="text-sm text-amber-700 dark:text-amber-400">{t('upload.warning')}</p>
       </div>
 

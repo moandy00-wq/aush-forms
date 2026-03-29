@@ -102,7 +102,7 @@ export default function SetupPage() {
       <div className="relative z-10 w-full max-w-lg">
         {/* Logo */}
         <div className="mb-6 flex items-center justify-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-teal-500">
+          <div className="flex h-10 w-10 items-center justify-center rounded bg-gradient-to-br from-cyan-400 to-teal-500">
             <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
             </svg>
@@ -130,7 +130,7 @@ export default function SetupPage() {
         <p className="mb-6 text-center text-sm font-medium text-neutral-500">{steps[step]}</p>
 
         {/* Card */}
-        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="rounded border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
 
           {/* Step 1: Business Info */}
           {step === 0 && (
@@ -143,7 +143,7 @@ export default function SetupPage() {
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder="Acme Financial Services"
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-neutral-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className="w-full rounded border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-neutral-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
               </div>
               <div>
@@ -155,7 +155,7 @@ export default function SetupPage() {
                     value={slug}
                     onChange={(e) => validateSlug(e.target.value)}
                     placeholder="my-business"
-                    className="flex-1 rounded-lg border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-neutral-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                    className="flex-1 rounded border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-neutral-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                   />
                 </div>
                 {slugError && <p className="mt-1 text-xs text-rose-500">{slugError}</p>}
@@ -167,7 +167,7 @@ export default function SetupPage() {
                   value={notificationEmail}
                   onChange={(e) => setNotificationEmail(e.target.value)}
                   placeholder="notifications@company.com"
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-neutral-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
+                  className="w-full rounded border border-neutral-300 bg-white px-3.5 py-2.5 text-sm outline-none transition-all placeholder:text-neutral-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
                 />
                 <p className="mt-1 text-xs text-neutral-400">We&apos;ll notify you here when a new form is submitted.</p>
               </div>
@@ -184,13 +184,13 @@ export default function SetupPage() {
                   <button
                     key={t.id}
                     onClick={() => selectTemplate(t.id)}
-                    className={`rounded-xl border p-4 text-left transition-all ${
+                    className={`rounded border p-4 text-left transition-all ${
                       template === t.id
                         ? 'border-cyan-500 bg-cyan-50 ring-2 ring-cyan-500/20 dark:bg-cyan-500/5'
                         : 'border-neutral-200 hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600'
                     }`}
                   >
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                    <div className={`flex h-10 w-10 items-center justify-center rounded ${
                       template === t.id
                         ? 'bg-cyan-500 text-white'
                         : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-800'
@@ -233,9 +233,9 @@ export default function SetupPage() {
               {/* Field Toggles */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Form Fields</label>
-                <div className="max-h-64 space-y-1 overflow-y-auto rounded-lg border border-neutral-200 p-3 dark:border-neutral-700">
+                <div className="max-h-64 space-y-1 overflow-y-auto rounded border border-neutral-200 p-3 dark:border-neutral-700">
                   {Object.entries(fieldConfig).map(([field, config]) => (
-                    <div key={field} className="flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                    <div key={field} className="flex items-center justify-between rounded-sm px-2 py-1.5 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => toggleField(field)}
@@ -271,19 +271,19 @@ export default function SetupPage() {
           {/* Step 4: Preview */}
           {step === 3 && (
             <div className="space-y-4 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: brandColor }}>
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded" style={{ backgroundColor: brandColor }}>
                 <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <h2 className="font-[family-name:var(--font-display)] text-xl font-bold">You&apos;re all set!</h2>
               <p className="text-sm text-neutral-500">Share this link with your clients:</p>
-              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-700 dark:bg-neutral-800">
+              <div className="rounded border border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-700 dark:bg-neutral-800">
                 <p className="font-mono text-sm font-semibold" style={{ color: brandColor }}>
                   {typeof window !== 'undefined' ? window.location.host : ''}/f/{slug}
                 </p>
               </div>
-              <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 text-left dark:border-neutral-700 dark:bg-neutral-800">
+              <div className="rounded border border-neutral-200 bg-neutral-50 p-4 text-left dark:border-neutral-700 dark:bg-neutral-800">
                 <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">Summary</p>
                 <div className="mt-2 space-y-1 text-sm">
                   <p><span className="text-neutral-500">Business:</span> {businessName}</p>
@@ -295,7 +295,7 @@ export default function SetupPage() {
           )}
 
           {error && (
-            <p className="mt-4 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{error}</p>
+            <p className="mt-4 rounded bg-rose-50 px-3 py-2 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">{error}</p>
           )}
 
           {/* Navigation */}
@@ -311,7 +311,7 @@ export default function SetupPage() {
               <button
                 onClick={() => setStep(step + 1)}
                 disabled={!canNext()}
-                className="flex items-center gap-1 rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-neutral-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+                className="flex items-center gap-1 rounded-sm bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-neutral-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
               >
                 Continue
                 <ArrowRight className="h-4 w-4" />
@@ -320,7 +320,7 @@ export default function SetupPage() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
+                className="rounded-sm px-6 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50"
                 style={{ backgroundColor: brandColor }}
               >
                 {loading ? 'Setting up...' : 'Go to Dashboard'}
