@@ -1,45 +1,23 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    y: 12,
-    filter: 'blur(4px)',
-  },
-  animate: {
-    opacity: 1,
-    y: 0,
-    filter: 'blur(0px)',
-  },
-  exit: {
-    opacity: 0,
-    y: -8,
-    filter: 'blur(2px)',
-  },
-}
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pathname}
-        variants={pageVariants}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{
-          duration: 0.4,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        suppressHydrationWarning
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={pathname}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.3,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      suppressHydrationWarning
+    >
+      {children}
+    </motion.div>
   )
 }
