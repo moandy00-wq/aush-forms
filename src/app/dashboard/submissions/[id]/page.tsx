@@ -39,20 +39,20 @@ export default async function SubmissionDetailPage({ params }: PageProps) {
   }
 
   const formData = submission.form_data as Record<string, string>
-  const name = [formData?.firstName, formData?.lastName].filter(Boolean).join(' ') || 'Unknown'
+  const name = [formData?.firstName, formData?.middleName, formData?.lastName].filter(Boolean).join(' ') || 'Unknown'
   const date = new Date(submission.created_at).toLocaleDateString('en-US', {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   })
 
   // Group fields by section
-  const personalFields = ['firstName', 'lastName', 'dateOfBirth', 'ssnLast4', 'email', 'phone', 'address', 'city', 'state', 'zipCode', 'emergencyContactName', 'emergencyContactPhone']
+  const personalFields = ['firstName', 'middleName', 'lastName', 'dateOfBirth', 'ssnLast4', 'email', 'phone', 'address', 'city', 'state', 'zipCode', 'emergencyContactName', 'emergencyContactPhone']
   const employmentFields = ['employerName', 'jobTitle', 'annualIncome', 'employmentStatus', 'yearsEmployed']
   const medicalFields = ['primaryCarePhysician', 'allergies', 'currentMedications', 'medicalConditions']
   const legalFields = ['caseType', 'opposingParty', 'caseDescription', 'urgencyLevel']
   const additionalFields = ['reasonForVisit', 'referralSource', 'preferredContact', 'notes']
 
   const fieldLabels: Record<string, string> = {
-    firstName: 'First Name', lastName: 'Last Name', dateOfBirth: 'Date of Birth',
+    firstName: 'First Name', middleName: 'Middle Name', lastName: 'Last Name', dateOfBirth: 'Date of Birth',
     ssnLast4: 'SSN (Last 4)', email: 'Email', phone: 'Phone', address: 'Address',
     city: 'City', state: 'State', zipCode: 'ZIP Code',
     emergencyContactName: 'Emergency Contact', emergencyContactPhone: 'Emergency Phone',

@@ -100,7 +100,7 @@ export default async function DashboardPage() {
               <tbody className="divide-y divide-neutral-200 bg-white dark:divide-neutral-800 dark:bg-neutral-950">
                 {allSubs.map((sub) => {
                   const formData = sub.form_data as Record<string, string>
-                  const name = [formData?.firstName, formData?.lastName].filter(Boolean).join(' ') || 'Unknown'
+                  const name = [formData?.firstName, formData?.middleName, formData?.lastName].filter(Boolean).join(' ') || 'Unknown'
                   const date = new Date(sub.created_at).toLocaleDateString('en-US', {
                     month: 'short', day: 'numeric', year: 'numeric',
                   })
