@@ -11,7 +11,6 @@ interface TourStep {
   title: string
   description: string
   icon: React.ElementType
-  zoom: number
   delay: number
 }
 
@@ -21,7 +20,6 @@ const steps: TourStep[] = [
     title: 'Your Command Center',
     description: 'Track every submission at a glance — total count, unread inbox, and weekly activity. These numbers update in real time as clients submit forms.',
     icon: LayoutDashboard,
-    zoom: 1.3,
     delay: 5000,
   },
   {
@@ -29,7 +27,6 @@ const steps: TourStep[] = [
     title: 'Submission Inbox',
     description: 'Every client submission lands here. Unread ones get a cyan pulse. Click any row to see the full form data, uploaded documents, and download the branded PDF.',
     icon: LayoutDashboard,
-    zoom: 1.2,
     delay: 5500,
   },
   {
@@ -37,15 +34,6 @@ const steps: TourStep[] = [
     title: 'Settings & Branding',
     description: 'Change your business name, brand color, form URL, and toggle which fields appear on your form. Your public form updates instantly when you save.',
     icon: Settings,
-    zoom: 1.6,
-    delay: 5000,
-  },
-  {
-    targetSelector: '[data-tour="form-link"]',
-    title: 'Your Shareable Link',
-    description: 'This is the link you give to clients. They visit it, fill out your branded form, upload documents, and submit — you get notified instantly.',
-    icon: ExternalLink,
-    zoom: 1.8,
     delay: 5000,
   },
 ]
@@ -61,8 +49,8 @@ export function DashboardTour({ slug }: DashboardTourProps) {
   const [showFinale, setShowFinale] = useState(false)
   const [copied, setCopied] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const prevElRef = useRef<HTMLElement | null>(null)
 
-  // Auto-start on first visit
   useEffect(() => {
     if (localStorage.getItem(TOUR_KEY)) return
     const timer = setTimeout(() => {
@@ -72,19 +60,53 @@ export function DashboardTour({ slug }: DashboardTourProps) {
     return () => clearTimeout(timer)
   }, [])
 
-  // Start the tour after intro
   const startTour = useCallback(() => {
     setShowIntro(false)
     setActive(true)
-    // Small delay then zoom to first step
     setTimeout(() => advanceToStep(0), 600)
   }, [])
 
+  function highlightElement(step: TourStep) {
+    // Reset previous element
+    if (prevElRef.current) {
+      prevElRef.current.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease, z-index 0s 0.5s'
+      prevElRef.current.style.transform = ''
+      prevElRef.current.style.boxShadow = ''
+      prevElRef.current.style.zIndex = ''
+      prevElRef.current.style.position = ''
+    }
+
+    const el = document.querySelector(step.targetSelector) as HTMLElement | null
+    if (!el) return
+
+    prevElRef.current = el
+
+    // Pop out effect: scale up + lift with shadow + high z-index
+    el.style.position = 'relative'
+    el.style.zIndex = '160'
+    el.style.transition = 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease'
+
+    requestAnimationFrame(() => {
+      el.style.transform = 'scale(1.08) translateY(-8px)'
+      el.style.boxShadow = '0 20px 60px rgba(6, 182, 212, 0.15), 0 8px 24px rgba(0, 0, 0, 0.4)'
+    })
+  }
+
+  function resetHighlight() {
+    if (prevElRef.current) {
+      prevElRef.current.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease'
+      prevElRef.current.style.transform = ''
+      prevElRef.current.style.boxShadow = ''
+      prevElRef.current.style.zIndex = ''
+      prevElRef.current.style.position = ''
+      prevElRef.current = null
+    }
+  }
+
   function advanceToStep(stepIndex: number) {
     if (stepIndex >= steps.length) {
-      // End tour, show finale
       setCurrentStep(-1)
-      resetZoom()
+      resetHighlight()
       setTimeout(() => {
         setActive(false)
         setShowFinale(true)
@@ -92,11 +114,14 @@ export function DashboardTour({ slug }: DashboardTourProps) {
       return
     }
 
-    setCurrentStep(stepIndex)
-    zoomToElement(steps[stepIndex]!)
+    // Brief reset between steps
+    if (currentStep >= 0) resetHighlight()
 
-    // Auto-advance
-    timerRef.current = setTimeout(() => advanceToStep(stepIndex + 1), steps[stepIndex]!.delay)
+    setTimeout(() => {
+      setCurrentStep(stepIndex)
+      highlightElement(steps[stepIndex]!)
+      timerRef.current = setTimeout(() => advanceToStep(stepIndex + 1), steps[stepIndex]!.delay)
+    }, currentStep >= 0 ? 300 : 0)
   }
 
   const handleNext = useCallback(() => {
@@ -110,40 +135,9 @@ export function DashboardTour({ slug }: DashboardTourProps) {
     setShowIntro(false)
     setShowFinale(false)
     setCurrentStep(-1)
-    resetZoom()
+    resetHighlight()
     localStorage.setItem(TOUR_KEY, 'true')
   }, [])
-
-  function zoomToElement(step: TourStep) {
-    const el = document.querySelector(step.targetSelector) as HTMLElement | null
-    const wrapper = document.querySelector('[data-tour-wrapper]') as HTMLElement | null
-    if (!el || !wrapper) return
-
-    const rect = el.getBoundingClientRect()
-    const wrapperRect = wrapper.getBoundingClientRect()
-
-    // Calculate center of target relative to wrapper
-    const targetCenterX = rect.left + rect.width / 2 - wrapperRect.left
-    const targetCenterY = rect.top + rect.height / 2 - wrapperRect.top
-
-    // Calculate translation to center the target on screen
-    const screenCenterX = window.innerWidth / 2
-    const screenCenterY = window.innerHeight / 2
-
-    const translateX = screenCenterX - targetCenterX * step.zoom
-    const translateY = screenCenterY - targetCenterY * step.zoom
-
-    wrapper.style.transition = 'transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)'
-    wrapper.style.transformOrigin = '0 0'
-    wrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${step.zoom})`
-  }
-
-  function resetZoom() {
-    const wrapper = document.querySelector('[data-tour-wrapper]') as HTMLElement | null
-    if (!wrapper) return
-    wrapper.style.transition = 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)'
-    wrapper.style.transform = 'translate(0, 0) scale(1)'
-  }
 
   function copyLink() {
     const link = `${window.location.origin}/f/${slug}`
@@ -197,7 +191,7 @@ export function DashboardTour({ slug }: DashboardTourProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7 }}
               >
-                Let me give you a quick walkthrough of everything at your fingertips. This&apos;ll take about 20 seconds.
+                Let me give you a quick walkthrough of everything at your fingertips. This&apos;ll take about 15 seconds.
               </motion.p>
 
               <motion.button
@@ -219,13 +213,13 @@ export function DashboardTour({ slug }: DashboardTourProps) {
       <AnimatePresence>
         {active && (
           <>
-            {/* Subtle vignette — lets zoomed content show through */}
+            {/* Darkened backdrop — highlighted element pops above this */}
             <motion.div
-              className="pointer-events-none fixed inset-0 z-[150]"
+              className="fixed inset-0 z-[155] bg-black/50"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              style={{ background: 'radial-gradient(ellipse 50% 45% at 50% 45%, transparent 0%, rgba(0,0,0,0.4) 100%)' }}
+              transition={{ duration: 0.4 }}
             />
 
             {/* Progress */}
@@ -355,7 +349,6 @@ export function DashboardTour({ slug }: DashboardTourProps) {
                   Share your form link with clients to start receiving submissions. Drop it in an email, text, or embed it on your website.
                 </motion.p>
 
-                {/* Link display + copy */}
                 <motion.div
                   className="mt-6 flex items-center gap-2 rounded border border-neutral-800 bg-neutral-900 px-4 py-3"
                   initial={{ opacity: 0, y: 10 }}

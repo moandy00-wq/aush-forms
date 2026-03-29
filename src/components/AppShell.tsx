@@ -27,7 +27,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="flex min-h-dvh" data-tour-wrapper>
+      <div className="flex min-h-dvh">
         <AppSidebar
           profile={profile as Profile}
           unreadCount={unreadCount || 0}
