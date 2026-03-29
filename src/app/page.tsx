@@ -570,38 +570,41 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* ── CTA ── */}
-      <section id="__cta" className="relative overflow-hidden border-t border-neutral-100 px-6 py-24 dark:border-neutral-900">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-600 via-cyan-700 to-teal-700" />
-        <AnimatedGridBackground color="#ffffff" maxLights={4} gridSize={56} showDots={false} className="opacity-20" />
-        <motion.div className="relative mx-auto max-w-2xl text-center" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-          <motion.h2 variants={fadeUp} className="font-[family-name:var(--font-display)] text-3xl font-bold text-white sm:text-4xl">
-            Ready to streamline<br />your intake?
-          </motion.h2>
-          <motion.p variants={fadeUp} className="mt-4 text-sm text-cyan-100">
-            Join hundreds of businesses saving hours every week with smart forms.
-          </motion.p>
-          <motion.div variants={fadeUp} className="mt-8">
-            <Link href="/signup" className="group inline-flex items-center gap-3 rounded-sm bg-white px-8 py-4 text-sm font-bold text-cyan-700 shadow-lg transition-all hover:bg-cyan-50 hover:shadow-xl">
-              Create Your Form
-              <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-cyan-600 transition-all group-hover:bg-cyan-500">
-                <ArrowRight className="h-3.5 w-3.5 text-white" />
-              </div>
-            </Link>
-          </motion.div>
-        </motion.div>
-      </section>
-
       {/* ── Footer ── */}
-      <footer className="border-t border-neutral-200 px-6 py-6 dark:border-neutral-800">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded bg-cyan-600">
-              <ClipboardList className="h-3 w-3 text-white" />
-            </div>
-            <span className="text-xs font-bold">Aush Forms</span>
+      <footer className="border-t border-neutral-200 dark:border-neutral-800">
+        {/* Trust strip */}
+        <div className="border-b border-neutral-200 px-6 py-8 dark:border-neutral-800">
+          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-8 sm:gap-12">
+            {stats.map((stat) => (
+              <div key={stat.label} className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 items-center justify-center rounded bg-cyan-500/10">
+                  <stat.icon className="h-4 w-4 text-cyan-500" />
+                </div>
+                <div>
+                  <p className="font-[family-name:var(--font-display)] text-sm font-extrabold">{stat.value}</p>
+                  <p className="text-[10px] text-neutral-500">{stat.label}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <p className="text-[11px] text-neutral-400">&copy; {new Date().getFullYear()} Aush Forms. All rights reserved.</p>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="px-6 py-5">
+          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
+            <div className="flex items-center gap-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded bg-cyan-600">
+                <ClipboardList className="h-3 w-3 text-white" />
+              </div>
+              <span className="text-xs font-bold">Aush Forms</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <a href="#how-it-works" className="text-[11px] text-neutral-500 transition-colors hover:text-neutral-300">How It Works</a>
+              <a href="#templates" className="text-[11px] text-neutral-500 transition-colors hover:text-neutral-300">Templates</a>
+              <a href="#features" className="text-[11px] text-neutral-500 transition-colors hover:text-neutral-300">Features</a>
+            </div>
+            <p className="text-[11px] text-neutral-400">&copy; {new Date().getFullYear()} Aush Forms. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

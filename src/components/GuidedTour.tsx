@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowRight, X, Play, Sparkles } from 'lucide-react'
+import { ArrowRight, X, Play, Sparkles, Rocket, Compass } from 'lucide-react'
 import Link from 'next/link'
 
 interface TourStep {
@@ -10,7 +10,7 @@ interface TourStep {
   title: string
   description: string
   position: 'top' | 'bottom' | 'center'
-  delay: number // ms to wait before advancing
+  delay: number
 }
 
 const tourSteps: TourStep[] = [
@@ -49,13 +49,6 @@ const tourSteps: TourStep[] = [
     position: 'top',
     delay: 4000,
   },
-  {
-    targetId: '__cta',
-    title: 'Ready to Start?',
-    description: 'Create your first smart intake form in under 2 minutes. Pick a template, customize your brand, share your link.',
-    position: 'top',
-    delay: 0, // Final step — no auto-advance
-  },
 ]
 
 const TOUR_STORAGE_KEY = 'aush-forms-tour-seen'
@@ -65,21 +58,18 @@ export function GuidedTour() {
   const [touring, setTouring] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [noteVisible, setNoteVisible] = useState(false)
+  const [showFinale, setShowFinale] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lenisRef = useRef<{ scrollTo: (target: HTMLElement, opts: { offset: number; duration: number }) => void } | null>(null)
 
-  // Show prompt after a short delay on first visit
   useEffect(() => {
     const seen = localStorage.getItem(TOUR_STORAGE_KEY)
     if (seen) return
-
     const timer = setTimeout(() => setShowPrompt(true), 1500)
     return () => clearTimeout(timer)
   }, [])
 
-  // Get Lenis instance from window
   useEffect(() => {
-    // Poll for Lenis on window (we'll expose it)
     const interval = setInterval(() => {
       if ((window as unknown as { __lenis?: typeof lenisRef.current }).__lenis) {
         lenisRef.current = (window as unknown as { __lenis: typeof lenisRef.current }).__lenis
@@ -90,14 +80,12 @@ export function GuidedTour() {
   }, [])
 
   const scrollToSection = useCallback((targetId: string) => {
-    let el: HTMLElement | null = null
-
     if (targetId === '__hero') {
       window.scrollTo({ top: 0 })
       return
     }
 
-    el = document.getElementById(targetId)
+    const el = document.getElementById(targetId)
 
     if (el && lenisRef.current) {
       lenisRef.current.scrollTo(el, { offset: -100, duration: 1.8 })
@@ -105,20 +93,17 @@ export function GuidedTour() {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
 
-    // Trigger workflow animation
     if (targetId === 'how-it-works') {
       setTimeout(() => {
         window.dispatchEvent(new Event('workflow-tour-trigger'))
       }, 2000)
     }
 
-    // Auto-demo orbital features: click 3 nodes sequentially
     if (targetId === 'features') {
-      const nodesToShow = [0, 2, 5] // OCR Auto-Fill, Auto-Save, Mobile Ready
+      const nodesToShow = [0, 2, 5]
       let i = 0
       const showNext = () => {
         if (i >= nodesToShow.length) {
-          // Deselect and resume rotation
           window.dispatchEvent(new CustomEvent('orbital-tour', { detail: { action: 'deselect' } }))
           return
         }
@@ -126,7 +111,7 @@ export function GuidedTour() {
         i++
         setTimeout(showNext, 1200)
       }
-      setTimeout(showNext, 2200) // Wait for scroll
+      setTimeout(showNext, 2200)
     }
   }, [])
 
@@ -136,18 +121,25 @@ export function GuidedTour() {
     setTouring(true)
     setCurrentStep(0)
 
-    // Scroll to top first, then start
     window.scrollTo({ top: 0 })
     setTimeout(() => {
       setNoteVisible(true)
-      // Auto-advance first step
       timerRef.current = setTimeout(() => advanceStep(0), tourSteps[0].delay)
     }, 800)
   }, [])
 
   const advanceStep = useCallback((fromStep: number) => {
     const nextStep = fromStep + 1
-    if (nextStep >= tourSteps.length) return
+
+    // If we've gone through all steps, show the finale
+    if (nextStep >= tourSteps.length) {
+      setNoteVisible(false)
+      setTimeout(() => {
+        setTouring(false)
+        setShowFinale(true)
+      }, 500)
+      return
+    }
 
     setNoteVisible(false)
 
@@ -155,16 +147,13 @@ export function GuidedTour() {
       setCurrentStep(nextStep)
       scrollToSection(tourSteps[nextStep].targetId)
 
-      // Show note after scroll completes
       setTimeout(() => {
         setNoteVisible(true)
-
-        // Auto-advance if this step has a delay
         if (tourSteps[nextStep].delay > 0) {
           timerRef.current = setTimeout(() => advanceStep(nextStep), tourSteps[nextStep].delay)
         }
-      }, 2200) // Wait for scroll animation to finish
-    }, 400) // Wait for note fade out
+      }, 2200)
+    }, 400)
   }, [scrollToSection])
 
   const handleNext = useCallback(() => {
@@ -176,6 +165,7 @@ export function GuidedTour() {
     if (timerRef.current) clearTimeout(timerRef.current)
     setTouring(false)
     setNoteVisible(false)
+    setShowFinale(false)
     localStorage.setItem(TOUR_STORAGE_KEY, 'true')
   }, [])
 
@@ -184,7 +174,6 @@ export function GuidedTour() {
     setShowPrompt(false)
   }, [])
 
-  const isLastStep = currentStep === tourSteps.length - 1
   const step = tourSteps[currentStep]
 
   return (
@@ -206,7 +195,6 @@ export function GuidedTour() {
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ duration: 0.4, ease: 'easeOut' }}
             >
-              {/* Gradient top bar */}
               <div className="h-1 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-600" />
 
               <div className="p-8 text-center">
@@ -246,7 +234,6 @@ export function GuidedTour() {
       <AnimatePresence>
         {touring && (
           <>
-            {/* Subtle vignette overlay */}
             <motion.div
               className="pointer-events-none fixed inset-0 z-[90]"
               initial={{ opacity: 0 }}
@@ -257,7 +244,6 @@ export function GuidedTour() {
               }}
             />
 
-            {/* Progress bar at top */}
             <motion.div
               className="fixed left-0 right-0 top-0 z-[101] h-1 bg-neutral-900"
               initial={{ opacity: 0 }}
@@ -271,7 +257,6 @@ export function GuidedTour() {
               />
             </motion.div>
 
-            {/* Skip button */}
             <motion.button
               onClick={endTour}
               className="fixed right-6 top-5 z-[101] flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-900/90 px-3 py-1.5 text-[11px] font-medium text-neutral-400 backdrop-blur-sm transition-all hover:border-neutral-700 hover:text-white"
@@ -284,7 +269,6 @@ export function GuidedTour() {
               Skip Tour
             </motion.button>
 
-            {/* Tour Note */}
             <AnimatePresence mode="wait">
               {noteVisible && step && (
                 <motion.div
@@ -296,24 +280,18 @@ export function GuidedTour() {
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                 >
                   <div className="overflow-hidden rounded border border-neutral-800 bg-[#111]/95 shadow-2xl shadow-black/40 backdrop-blur-xl">
-                    {/* Gradient accent */}
                     <div className="h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
 
                     <div className="p-5">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-400">
-                              {currentStep + 1} / {tourSteps.length}
-                            </span>
-                          </div>
-                          <h3 className="mt-2 font-[family-name:var(--font-display)] text-base font-bold text-white">{step.title}</h3>
-                          <p className="mt-1.5 text-sm leading-relaxed text-neutral-400">{step.description}</p>
-                        </div>
+                      <div className="flex-1">
+                        <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-400">
+                          {currentStep + 1} / {tourSteps.length}
+                        </span>
+                        <h3 className="mt-2 font-[family-name:var(--font-display)] text-base font-bold text-white">{step.title}</h3>
+                        <p className="mt-1.5 text-sm leading-relaxed text-neutral-400">{step.description}</p>
                       </div>
 
                       <div className="mt-4 flex items-center justify-between">
-                        {/* Step dots */}
                         <div className="flex items-center gap-1.5">
                           {tourSteps.map((_, i) => (
                             <div
@@ -329,25 +307,13 @@ export function GuidedTour() {
                           ))}
                         </div>
 
-                        {/* Action button */}
-                        {isLastStep ? (
-                          <Link
-                            href="/signup"
-                            onClick={endTour}
-                            className="flex items-center gap-2 rounded-sm bg-gradient-to-r from-cyan-600 to-teal-600 px-5 py-2.5 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-cyan-500/20"
-                          >
-                            Create Your Form
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </Link>
-                        ) : (
-                          <button
-                            onClick={handleNext}
-                            className="flex items-center gap-1.5 rounded-sm bg-neutral-800 px-4 py-2 text-sm font-semibold text-neutral-300 transition-all hover:bg-neutral-700 hover:text-white"
-                          >
-                            Next
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </button>
-                        )}
+                        <button
+                          onClick={handleNext}
+                          className="flex items-center gap-1.5 rounded-sm bg-neutral-800 px-4 py-2 text-sm font-semibold text-neutral-300 transition-all hover:bg-neutral-700 hover:text-white"
+                        >
+                          Next
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -355,6 +321,106 @@ export function GuidedTour() {
               )}
             </AnimatePresence>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Tour Finale — fullscreen CTA ── */}
+      <AnimatePresence>
+        {showFinale && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {/* Blurred backdrop */}
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
+
+            <motion.div
+              className="relative mx-6 w-full max-w-lg overflow-hidden rounded border border-neutral-800 bg-[#0d0d0d] shadow-2xl shadow-cyan-500/5"
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* Top gradient bar */}
+              <div className="h-1 bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-500" />
+
+              <div className="p-8 sm:p-10 text-center">
+                {/* Animated checkmark */}
+                <motion.div
+                  className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-teal-500"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.4, type: 'spring', stiffness: 200, damping: 12 }}
+                >
+                  <motion.svg
+                    className="h-8 w-8 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    transition={{ delay: 0.7, duration: 0.4 }}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </motion.svg>
+                </motion.div>
+
+                <motion.h2
+                  className="mt-6 font-[family-name:var(--font-display)] text-2xl font-bold text-white"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  You&apos;ve seen it all
+                </motion.h2>
+                <motion.p
+                  className="mt-2.5 text-sm leading-relaxed text-neutral-400"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  Smart intake forms with OCR, auto-save, branded PDFs, and instant notifications. Your clients fill forms in minutes — you get the data instantly.
+                </motion.p>
+
+                <motion.div
+                  className="mt-8 flex flex-col gap-3"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <Link
+                    href="/signup"
+                    onClick={endTour}
+                    className="shimmer-line group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-sm bg-gradient-to-r from-cyan-600 to-teal-600 py-4 text-sm font-bold text-white transition-all hover:shadow-lg hover:shadow-cyan-500/20"
+                  >
+                    <Rocket className="relative z-10 h-4 w-4" />
+                    <span className="relative z-10">Create Your Form — Free</span>
+                  </Link>
+                  <button
+                    onClick={endTour}
+                    className="group flex w-full items-center justify-center gap-2 rounded-sm border border-neutral-800 py-3.5 text-sm font-medium text-neutral-500 transition-all hover:border-neutral-600 hover:text-neutral-300"
+                  >
+                    <Compass className="h-4 w-4" />
+                    Keep Exploring
+                  </button>
+                </motion.div>
+
+                {/* Trust micro-copy */}
+                <motion.p
+                  className="mt-5 text-[11px] text-neutral-600"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9 }}
+                >
+                  No credit card required. Set up in under 2 minutes.
+                </motion.p>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
