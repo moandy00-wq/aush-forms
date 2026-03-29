@@ -244,77 +244,60 @@ export function GuidedTour() {
               }}
             />
 
-            <motion.div
-              className="fixed left-0 right-0 top-0 z-[101] h-1 bg-neutral-900"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <motion.div
-                className="h-full bg-gradient-to-r from-cyan-500 to-teal-400"
-                animate={{ width: `${((currentStep + 1) / tourSteps.length) * 100}%` }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-              />
-            </motion.div>
-
-            <motion.button
-              onClick={endTour}
-              className="fixed right-6 top-5 z-[101] flex items-center gap-1.5 rounded-full border border-neutral-800 bg-neutral-900/90 px-3 py-1.5 text-[11px] font-medium text-neutral-400 backdrop-blur-sm transition-all hover:border-neutral-700 hover:text-white"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <X className="h-3 w-3" />
-              Skip Tour
-            </motion.button>
-
             <AnimatePresence mode="wait">
               {noteVisible && step && (
                 <motion.div
                   key={currentStep}
-                  className="fixed bottom-8 left-1/2 z-[101] w-full max-w-lg -translate-x-1/2 px-6"
-                  initial={{ opacity: 0, y: 30 }}
+                  className="fixed top-0 left-0 right-0 z-[101]"
+                  initial={{ opacity: 0, y: -40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  exit={{ opacity: 0, y: -30 }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
                 >
-                  <div className="overflow-hidden rounded border border-neutral-800 bg-[#111]/95 shadow-2xl shadow-black/40 backdrop-blur-xl">
-                    <div className="h-0.5 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
+                  <div className="bg-[#111]/95 border-b border-neutral-800 backdrop-blur-xl shadow-lg">
+                    {/* Progress bar integrated */}
+                    <div className="h-0.5 bg-neutral-900">
+                      <div className="h-full bg-gradient-to-r from-cyan-500 to-teal-400 transition-all duration-500" style={{ width: `${((currentStep + 1) / tourSteps.length) * 100}%` }} />
+                    </div>
 
-                    <div className="p-5">
-                      <div className="flex-1">
-                        <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-400">
-                          {currentStep + 1} / {tourSteps.length}
-                        </span>
-                        <h3 className="mt-2 font-[family-name:var(--font-display)] text-base font-bold text-white">{step.title}</h3>
-                        <p className="mt-1.5 text-sm leading-relaxed text-neutral-400">{step.description}</p>
+                    <div className="flex items-center gap-4 px-4 sm:px-6 py-3">
+                      {/* Step dots */}
+                      <div className="hidden sm:flex items-center gap-1">
+                        {tourSteps.map((_, i) => (
+                          <div
+                            key={i}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${
+                              i === currentStep ? 'w-5 bg-cyan-500' : i < currentStep ? 'w-1.5 bg-cyan-500/40' : 'w-1.5 bg-neutral-700'
+                            }`}
+                          />
+                        ))}
                       </div>
 
-                      <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          {tourSteps.map((_, i) => (
-                            <div
-                              key={i}
-                              className={`h-1.5 rounded-full transition-all duration-300 ${
-                                i === currentStep
-                                  ? 'w-6 bg-cyan-500'
-                                  : i < currentStep
-                                  ? 'w-1.5 bg-cyan-500/40'
-                                  : 'w-1.5 bg-neutral-700'
-                              }`}
-                            />
-                          ))}
+                      {/* Title + description */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-cyan-400 shrink-0">{currentStep + 1}/{tourSteps.length}</span>
+                          <h3 className="text-sm font-bold text-white truncate">{step.title}</h3>
                         </div>
-
-                        <button
-                          onClick={handleNext}
-                          className="flex items-center gap-1.5 rounded-sm bg-neutral-800 px-4 py-2 text-sm font-semibold text-neutral-300 transition-all hover:bg-neutral-700 hover:text-white"
-                        >
-                          Next
-                          <ArrowRight className="h-3.5 w-3.5" />
-                        </button>
+                        <p className="text-xs text-neutral-400 truncate mt-0.5">{step.description}</p>
                       </div>
+
+                      {/* Next button */}
+                      <button
+                        onClick={handleNext}
+                        className="flex items-center gap-1 shrink-0 rounded-sm bg-neutral-800 px-3 py-1.5 text-xs font-semibold text-neutral-300 transition-all hover:bg-neutral-700 hover:text-white"
+                      >
+                        Next
+                        <ArrowRight className="h-3 w-3" />
+                      </button>
+
+                      {/* Skip */}
+                      <button
+                        onClick={endTour}
+                        className="shrink-0 text-neutral-500 hover:text-white transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                 </motion.div>
