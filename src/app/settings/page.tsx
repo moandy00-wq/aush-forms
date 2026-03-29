@@ -162,7 +162,7 @@ export default function SettingsPage() {
           <div className="card-hover-glow rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
             <h2 className="text-sm font-semibold text-neutral-950 dark:text-white">Form Fields</h2>
             <p className="mt-1 text-xs text-neutral-500">Toggle fields on/off and set required status.</p>
-            <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
+            <div className="mt-3 max-h-64 space-y-1 overflow-y-auto" data-lenis-prevent>
               {Object.entries(fieldConfig).map(([field, config]) => (
                 <div key={field} className="flex items-center justify-between rounded-sm px-2 py-1.5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-800">
                   <div className="flex items-center gap-2">

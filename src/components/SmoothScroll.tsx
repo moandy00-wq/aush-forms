@@ -13,6 +13,30 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       smoothWheel: true,
       wheelMultiplier: 0.9,
       touchMultiplier: 1.5,
+      prevent: (node: HTMLElement) => {
+        // Let native scroll work inside any scrollable container, form, or select
+        if (
+          node.tagName === 'SELECT' ||
+          node.tagName === 'TEXTAREA' ||
+          node.closest('[data-lenis-prevent]') ||
+          node.closest('.overflow-y-auto') ||
+          node.closest('.overflow-x-auto') ||
+          node.closest('.overflow-auto')
+        ) {
+          return true
+        }
+        // Check if the element or any ancestor has scrollable overflow
+        let el: HTMLElement | null = node
+        while (el && el !== document.body) {
+          const style = getComputedStyle(el)
+          const overflowY = style.overflowY
+          if ((overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight) {
+            return true
+          }
+          el = el.parentElement
+        }
+        return false
+      },
     })
 
     lenisRef.current = lenis

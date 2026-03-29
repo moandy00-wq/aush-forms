@@ -94,15 +94,21 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center px-6 py-12">
+    <div
+      className="flex min-h-dvh items-center justify-center px-6 py-12 transition-colors duration-700"
+      style={{ '--brand': brandColor } as React.CSSProperties}
+    >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-100/40 blur-[120px] dark:bg-cyan-500/5" />
+        <div
+          className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[120px] transition-all duration-700"
+          style={{ backgroundColor: `${brandColor}12` }}
+        />
       </div>
 
       <div className="relative z-10 w-full max-w-lg">
         {/* Logo */}
         <div className="mb-6 flex items-center justify-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded bg-gradient-to-br from-cyan-400 to-teal-500">
+          <div className="flex h-10 w-10 items-center justify-center rounded transition-colors duration-700" style={{ backgroundColor: brandColor }}>
             <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
             </svg>
@@ -114,15 +120,21 @@ export default function SetupPage() {
         <div className="mb-6 flex items-center justify-center gap-2">
           {steps.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${
-                i <= step
-                  ? 'bg-gradient-to-br from-cyan-400 to-teal-500 text-white'
-                  : 'border border-neutral-300 text-neutral-400 dark:border-neutral-700'
-              }`}>
+              <div
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-500 ${
+                  i <= step
+                    ? 'text-white'
+                    : 'border border-neutral-300 text-neutral-400 dark:border-neutral-700'
+                }`}
+                style={i <= step ? { backgroundColor: brandColor } : undefined}
+              >
                 {i < step ? <Check className="h-4 w-4" /> : i + 1}
               </div>
               {i < steps.length - 1 && (
-                <div className={`h-px w-6 transition-all ${i < step ? 'bg-cyan-500' : 'bg-neutral-300 dark:bg-neutral-700'}`} />
+                <div
+                  className="h-px w-6 transition-all duration-500"
+                  style={{ backgroundColor: i < step ? brandColor : undefined }}
+                />
               )}
             </div>
           ))}
@@ -184,17 +196,21 @@ export default function SetupPage() {
                   <button
                     key={t.id}
                     onClick={() => selectTemplate(t.id)}
-                    className={`rounded border p-4 text-left transition-all ${
+                    className={`rounded border p-4 text-left transition-all duration-300 ${
                       template === t.id
-                        ? 'border-cyan-500 bg-cyan-50 ring-2 ring-cyan-500/20 dark:bg-cyan-500/5'
+                        ? 'ring-2 ring-opacity-20 dark:bg-white/[0.03]'
                         : 'border-neutral-200 hover:border-neutral-300 dark:border-neutral-700 dark:hover:border-neutral-600'
                     }`}
+                    style={template === t.id ? { borderColor: brandColor, backgroundColor: `${brandColor}08` } : undefined}
                   >
-                    <div className={`flex h-10 w-10 items-center justify-center rounded ${
-                      template === t.id
-                        ? 'bg-cyan-500 text-white'
-                        : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-800'
-                    }`}>
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded transition-colors duration-300 ${
+                        template === t.id
+                          ? 'text-white'
+                          : 'bg-neutral-100 text-neutral-500 dark:bg-neutral-800'
+                      }`}
+                      style={template === t.id ? { backgroundColor: brandColor } : undefined}
+                    >
                       {iconMap[t.iconName]}
                     </div>
                     <p className="mt-3 text-sm font-semibold">{t.name}</p>
@@ -221,8 +237,8 @@ export default function SetupPage() {
                     <button
                       key={color}
                       onClick={() => setBrandColor(color)}
-                      className={`h-8 w-8 rounded-full transition-all ${
-                        brandColor === color ? 'ring-2 ring-offset-2 ring-neutral-400 dark:ring-offset-neutral-900' : ''
+                      className={`h-8 w-8 rounded-full transition-all duration-300 ${
+                        brandColor === color ? 'scale-125 ring-2 ring-offset-2 ring-neutral-400 dark:ring-offset-neutral-900' : 'hover:scale-110'
                       }`}
                       style={{ backgroundColor: color }}
                     />
@@ -233,17 +249,18 @@ export default function SetupPage() {
               {/* Field Toggles */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Form Fields</label>
-                <div className="max-h-64 space-y-1 overflow-y-auto rounded border border-neutral-200 p-3 dark:border-neutral-700">
+                <div className="max-h-64 space-y-1 overflow-y-auto rounded border border-neutral-200 p-3 dark:border-neutral-700" data-lenis-prevent>
                   {Object.entries(fieldConfig).map(([field, config]) => (
                     <div key={field} className="flex items-center justify-between rounded-sm px-2 py-1.5 hover:bg-neutral-50 dark:hover:bg-neutral-800">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => toggleField(field)}
-                          className={`flex h-5 w-5 items-center justify-center rounded border transition-all ${
+                          className={`flex h-5 w-5 items-center justify-center rounded border transition-all duration-300 ${
                             config.enabled
-                              ? 'border-cyan-500 bg-cyan-500 text-white'
+                              ? 'text-white'
                               : 'border-neutral-300 dark:border-neutral-600'
                           }`}
+                          style={config.enabled ? { backgroundColor: brandColor, borderColor: brandColor } : undefined}
                         >
                           {config.enabled && <Check className="h-3 w-3" />}
                         </button>
