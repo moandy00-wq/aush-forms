@@ -87,6 +87,7 @@
   "steps.review.description": "Revise su información y envíe.",
 
   "form.firstName": "Nombre",
+  "form.middleName": "Segundo Nombre",
   "form.lastName": "Apellido",
   "form.dateOfBirth": "Fecha de Nacimiento",
   "form.ssnLast4": "SSN (Últimos 4 Dígitos)",

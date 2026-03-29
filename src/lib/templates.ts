@@ -192,6 +192,7 @@ export function getTemplate(id: string): TemplateConfig {
 
 export const defaultFormValues = {
   firstName: '',
+  middleName: '',
   lastName: '',
   dateOfBirth: '',
   ssnLast4: '',

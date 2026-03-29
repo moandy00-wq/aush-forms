@@ -7,6 +7,7 @@ import type { LucideIcon } from 'lucide-react'
 export interface IntakeFormData {
   // Personal Info (all templates)
   firstName: string
+  middleName: string
   lastName: string
   dateOfBirth: string
   ssnLast4: string

@@ -87,6 +87,7 @@
   "steps.review.description": "Review your information and submit.",
 
   "form.firstName": "First Name",
+  "form.middleName": "Middle Name",
   "form.lastName": "Last Name",
   "form.dateOfBirth": "Date of Birth",
   "form.ssnLast4": "SSN (Last 4 Digits)",

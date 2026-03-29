@@ -7,6 +7,7 @@ import { FileDropzone } from '@/components/ui/FileDropzone'
 import { processImage, terminateOcrWorker } from '@/lib/ocr'
 import type { IntakeFormData, UploadedFile, FieldConfig } from '@/lib/types'
 import { useTranslation } from '@/lib/i18n/TranslationProvider'
+import { AlertTriangle } from 'lucide-react'
 
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
@@ -80,11 +81,22 @@ export function PersonalInfo({ fieldConfig, idDocument, onIdDocument, showMedica
         onClear={() => onIdDocument(null)}
       />
 
+      {/* OCR accuracy warning */}
+      {autoFilledFields.size > 0 && (
+        <div className="flex items-start gap-2.5 rounded border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+          <p className="text-xs leading-relaxed text-amber-600 dark:text-amber-400">
+            Auto-detection may not be 100% accurate. Please review all fields below and correct any errors before continuing.
+          </p>
+        </div>
+      )}
+
       {/* Form Fields */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {isEnabled('firstName') && (
           <FormField name="firstName" labelKey="form.firstName" required={isRequired('firstName')} autoFilled={autoFilledFields.has('firstName')} />
         )}
+        <FormField name="middleName" labelKey="form.middleName" autoFilled={autoFilledFields.has('middleName')} />
         {isEnabled('lastName') && (
           <FormField name="lastName" labelKey="form.lastName" required={isRequired('lastName')} autoFilled={autoFilledFields.has('lastName')} />
         )}
