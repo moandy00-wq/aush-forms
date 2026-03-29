@@ -62,6 +62,7 @@ export function AppSidebar({ profile, unreadCount }: AppSidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              data-tour={item.href === '/settings' ? 'nav-settings' : undefined}
               className={`group flex items-center gap-3 rounded px-3 py-2.5 text-[13px] font-medium transition-all duration-150 ${
                 isActive
                   ? 'sidebar-active-glow bg-white text-neutral-950 dark:bg-neutral-800 dark:text-white'
@@ -98,7 +99,7 @@ export function AppSidebar({ profile, unreadCount }: AppSidebarProps) {
 
       {/* Footer */}
       <div className="relative space-y-2 px-3 pb-4">
-        <div className="gradient-border rounded border border-neutral-200 bg-white px-3 py-2.5 dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="gradient-border rounded border border-neutral-200 bg-white px-3 py-2.5 dark:border-neutral-800 dark:bg-neutral-900" data-tour="form-link">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Your Form Link</p>
           <p className="mt-0.5 truncate font-mono text-xs font-semibold text-cyan-600 dark:text-cyan-400">/f/{profile.slug}</p>
         </div>
