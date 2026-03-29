@@ -171,35 +171,42 @@ function WorkflowDemo() {
   const isInView = useInView(sectionRef, { once: false, margin: '-100px' })
   const [activeStep, setActiveStep] = useState(-1)
   const hasPlayedRef = useRef(false)
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+
+  const clearAllTimers = useCallback(() => {
+    timersRef.current.forEach(clearTimeout)
+    timersRef.current = []
+  }, [])
 
   const playAnimation = useCallback(() => {
+    clearAllTimers()
     setActiveStep(-1)
-    const timers: ReturnType<typeof setTimeout>[] = []
     workflowSteps.forEach((_, i) => {
-      timers.push(setTimeout(() => setActiveStep(i), 600 + i * 800))
+      timersRef.current.push(setTimeout(() => {
+        setActiveStep(i)
+        // Auto-scroll this step into view
+        const stepEl = document.querySelector(`[data-workflow-step="${i}"]`)
+        if (stepEl) stepEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 600 + i * 800))
     })
-    return timers
-  }, [])
+  }, [clearAllTimers])
 
   useEffect(() => {
     if (!isInView || hasPlayedRef.current) return
     hasPlayedRef.current = true
-    const timers = playAnimation()
-    return () => timers.forEach(clearTimeout)
-  }, [isInView, playAnimation])
+    playAnimation()
+    return clearAllTimers
+  }, [isInView, playAnimation, clearAllTimers])
 
   useEffect(() => {
     function handleTourTrigger() {
+      clearAllTimers()
       setActiveStep(-1)
-      setTimeout(() => {
-        const timers = playAnimation()
-        const cleanup = () => timers.forEach(clearTimeout)
-        window.addEventListener('workflow-tour-trigger', cleanup, { once: true })
-      }, 100)
+      setTimeout(() => playAnimation(), 100)
     }
     window.addEventListener('workflow-tour-trigger', handleTourTrigger)
     return () => window.removeEventListener('workflow-tour-trigger', handleTourTrigger)
-  }, [playAnimation])
+  }, [playAnimation, clearAllTimers])
 
   return (
     <section id="how-it-works" ref={sectionRef} className="relative border-t border-neutral-100 px-4 sm:px-6 py-16 sm:py-24 dark:border-neutral-900">
@@ -223,7 +230,7 @@ function WorkflowDemo() {
             const isCurrent = i === activeStep
 
             return (
-              <div key={step.title} className="relative flex gap-3 sm:gap-6">
+              <div key={step.title} data-workflow-step={i} className="relative flex gap-3 sm:gap-6">
                 <div className="flex flex-col items-center">
                   <motion.div
                     className={`relative z-10 flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded transition-all duration-500 ${
@@ -487,19 +494,37 @@ export default function HomePage() {
             </div>
           </motion.div>
 
-          <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {templates.map((tmpl) => (
-              <motion.div key={tmpl.name} variants={fadeUp} className="card-hover-glow group relative overflow-hidden rounded border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900/50">
-                <div className="flex h-10 w-10 items-center justify-center rounded text-white" style={{ backgroundColor: tmpl.color }}>
-                  <tmpl.icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 font-[family-name:var(--font-display)] text-sm font-bold">{tmpl.name}</h3>
-                <p className="mt-1 text-xs text-neutral-500">{tmpl.desc}</p>
-                <div className="mt-4 flex items-center gap-1.5">
-                  <div className="h-1 flex-1 rounded-full bg-neutral-100 dark:bg-neutral-800">
-                    <div className="h-1 rounded-full transition-all duration-500 group-hover:brightness-125" style={{ width: `${(tmpl.fields / 19) * 100}%`, backgroundColor: tmpl.color }} />
+              <motion.div key={tmpl.name} variants={fadeUp} className="card-hover-glow group relative overflow-hidden rounded border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900/50">
+                {/* Colored top bar */}
+                <div className="h-1.5" style={{ backgroundColor: tmpl.color }} />
+
+                <div className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded text-white" style={{ backgroundColor: tmpl.color }}>
+                      <tmpl.icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-[family-name:var(--font-display)] text-base font-bold">{tmpl.name}</h3>
+                      <p className="text-xs text-neutral-500">{tmpl.desc}</p>
+                    </div>
                   </div>
-                  <span className="text-[10px] font-semibold text-neutral-400">{tmpl.fields} fields</span>
+
+                  {/* Field count + visual indicator */}
+                  <div className="mt-5 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <div className="h-1.5 flex-1 rounded-full bg-neutral-100 dark:bg-neutral-800" style={{ width: 80 }}>
+                        <div className="h-1.5 rounded-full transition-all duration-500 group-hover:brightness-125" style={{ width: `${(tmpl.fields / 19) * 100}%`, backgroundColor: tmpl.color }} />
+                      </div>
+                    </div>
+                    <span className="rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ backgroundColor: `${tmpl.color}15`, color: tmpl.color }}>{tmpl.fields} fields</span>
+                  </div>
+
+                  <Link href="/signup" className="mt-4 flex items-center gap-1 text-xs font-semibold transition-colors hover:text-cyan-400" style={{ color: tmpl.color }}>
+                    Use this template
+                    <ArrowRight className="h-3 w-3" />
+                  </Link>
                 </div>
               </motion.div>
             ))}

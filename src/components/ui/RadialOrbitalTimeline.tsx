@@ -95,13 +95,23 @@ export default function RadialOrbitalTimeline({
     return () => observer.disconnect()
   }, [])
 
-  // Auto-rotate
+  // Auto-rotate with rAF for smooth animation
   useEffect(() => {
     if (!autoRotate || showcase) return
-    const timer = setInterval(() => {
-      if (visibleRef.current) setRotationAngle((prev) => (prev + autoRotateSpeed) % 360)
-    }, 50)
-    return () => clearInterval(timer)
+    let animId: number
+    let lastTime = 0
+    function tick(time: number) {
+      if (lastTime) {
+        const delta = time - lastTime
+        if (visibleRef.current) {
+          setRotationAngle((prev) => (prev + autoRotateSpeed * delta * 0.02) % 360)
+        }
+      }
+      lastTime = time
+      animId = requestAnimationFrame(tick)
+    }
+    animId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(animId)
   }, [autoRotate, autoRotateSpeed, showcase])
 
   // Showcase auto-cycle
@@ -181,11 +191,12 @@ export default function RadialOrbitalTimeline({
           return (
             <div
               key={item.id}
-              className="absolute transition-all duration-500 will-change-transform"
+              className="absolute will-change-transform"
               style={{
                 transform: `translate(${pos.x}px, ${pos.y}px)`,
                 zIndex: isExpanded ? 80 : pos.zIndex,
                 opacity: isExpanded ? 1 : pos.opacity,
+                transition: expandedId !== null ? 'opacity 0.3s ease' : 'none',
               }}
               onClick={(e) => { e.stopPropagation(); toggleItem(item.id) }}
             >
