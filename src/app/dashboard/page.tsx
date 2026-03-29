@@ -82,9 +82,14 @@ export default async function DashboardPage() {
             </div>
             <h3 className="mt-4 text-sm font-semibold text-neutral-950 dark:text-white">No submissions yet</h3>
             <p className="mt-1 text-sm text-neutral-500">Share your form link with clients to start receiving submissions.</p>
-            <p className="mt-4 rounded bg-cyan-50 px-4 py-2 font-mono text-sm text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-400">
-              /f/{profile?.slug}
-            </p>
+            <a
+              href={`/f/${profile?.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block rounded border border-cyan-500/20 bg-cyan-50 px-5 py-2.5 font-mono text-sm font-semibold text-cyan-700 transition-all hover:bg-cyan-100 dark:bg-cyan-500/10 dark:text-cyan-400 dark:hover:bg-cyan-500/15"
+            >
+              aush-forms.vercel.app/f/{profile?.slug}
+            </a>
           </div>
         ) : (
           <div className="overflow-x-auto rounded border border-neutral-200 dark:border-neutral-800">
