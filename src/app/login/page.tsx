@@ -1,9 +1,24 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Fingerprint, Loader2 } from 'lucide-react'
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+}
+
+const slideIn = {
+  hidden: { opacity: 0, x: -30 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -31,7 +46,12 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-dvh">
       {/* Left — Branding panel */}
-      <div className="relative hidden w-[45%] overflow-hidden bg-gradient-to-br from-cyan-950 via-[#0a1628] to-neutral-950 lg:flex lg:flex-col lg:justify-between">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={slideIn}
+        className="relative hidden w-[45%] overflow-hidden bg-gradient-to-br from-cyan-950 via-[#0a1628] to-neutral-950 lg:flex lg:flex-col lg:justify-between"
+      >
         <div className="dot-grid absolute inset-0 opacity-60" />
         <div className="relative z-10 p-10">
           <Link href="/" className="flex items-center gap-2.5">
@@ -73,24 +93,26 @@ export default function LoginPage() {
 
         {/* Gradient orb */}
         <div className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-cyan-500/10 blur-[100px]" />
-      </div>
+      </motion.div>
 
       {/* Right — Form */}
       <div className="flex flex-1 flex-col justify-center px-6 sm:px-12 lg:px-20">
         <div className="mx-auto w-full max-w-[380px]">
-          <Link href="/" className="mb-10 inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400 transition-colors hover:text-neutral-600 dark:hover:text-neutral-300">
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to home
-          </Link>
+          <motion.div custom={0} initial="hidden" animate="visible" variants={fadeIn}>
+            <Link href="/" className="mb-10 inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400 transition-colors hover:text-neutral-600 dark:hover:text-neutral-300">
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to home
+            </Link>
+          </motion.div>
 
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-800">
+          <motion.div custom={1} initial="hidden" animate="visible" variants={fadeIn} className="flex h-11 w-11 items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-800">
             <Fingerprint className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
-          </div>
+          </motion.div>
 
-          <h1 className="mt-5 font-[family-name:var(--font-display)] text-[26px] font-bold tracking-tight">Sign in</h1>
-          <p className="mt-1.5 text-sm text-neutral-500">Enter your credentials to access your dashboard.</p>
+          <motion.h1 custom={2} initial="hidden" animate="visible" variants={fadeIn} className="mt-5 font-[family-name:var(--font-display)] text-[26px] font-bold tracking-tight">Sign in</motion.h1>
+          <motion.p custom={3} initial="hidden" animate="visible" variants={fadeIn} className="mt-1.5 text-sm text-neutral-500">Enter your credentials to access your dashboard.</motion.p>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <motion.form custom={4} initial="hidden" animate="visible" variants={fadeIn} onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div>
               <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-500">Email</label>
               <input
@@ -130,18 +152,20 @@ export default function LoginPage() {
                 {loading ? 'Signing in...' : 'Continue'}
               </span>
             </button>
-          </form>
+          </motion.form>
 
-          <div className="mt-8 flex items-center gap-3">
-            <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-            <span className="text-xs text-neutral-400">or</span>
-            <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
-          </div>
+          <motion.div custom={5} initial="hidden" animate="visible" variants={fadeIn}>
+            <div className="mt-8 flex items-center gap-3">
+              <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+              <span className="text-xs text-neutral-400">or</span>
+              <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+            </div>
 
-          <p className="mt-6 text-center text-sm text-neutral-500">
-            New to Aush Forms?{' '}
-            <Link href="/signup" className="font-semibold text-cyan-600 transition-colors hover:text-cyan-500">Create an account</Link>
-          </p>
+            <p className="mt-6 text-center text-sm text-neutral-500">
+              New to Aush Forms?{' '}
+              <Link href="/signup" className="font-semibold text-cyan-600 transition-colors hover:text-cyan-500">Create an account</Link>
+            </p>
+          </motion.div>
         </div>
       </div>
     </div>
