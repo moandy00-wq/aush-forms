@@ -54,12 +54,47 @@ export default function RadialOrbitalTimeline({
     }
   }
 
+  const animatingRef = useRef(false)
+
+  // Smoothly animate angle from current to target over ~600ms
+  function animateToAngle(targetAngle: number, onDone?: () => void) {
+    const startAngle = angleRef.current
+    // Find shortest rotation path
+    let diff = targetAngle - startAngle
+    if (diff > 180) diff -= 360
+    if (diff < -180) diff += 360
+
+    const duration = 600
+    const startTime = performance.now()
+    animatingRef.current = true
+
+    function tick(time: number) {
+      const elapsed = time - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3)
+      angleRef.current = (startAngle + diff * eased) % 360
+      if (angleRef.current < 0) angleRef.current += 360
+      updateNodePositions()
+
+      if (progress < 1) {
+        requestAnimationFrame(tick)
+      } else {
+        animatingRef.current = false
+        onDone?.()
+      }
+    }
+    requestAnimationFrame(tick)
+  }
+
   const selectNode = useCallback((id: number) => {
-    setExpandedId(id)
     setAutoRotate(false)
     const idx = timelineData.findIndex((i) => i.id === id)
-    angleRef.current = 270 - (idx / timelineData.length) * 360
-    forceRender((n) => n + 1)
+    const targetAngle = (270 - (idx / timelineData.length) * 360 + 360) % 360
+    animateToAngle(targetAngle, () => {
+      setExpandedId(id)
+      forceRender((n) => n + 1)
+    })
   }, [timelineData])
 
   const deselectNode = useCallback(() => {
@@ -105,7 +140,7 @@ export default function RadialOrbitalTimeline({
     let lastTime = 0
 
     function tick(time: number) {
-      if (lastTime && visibleRef.current) {
+      if (lastTime && visibleRef.current && !animatingRef.current) {
         const delta = time - lastTime
         angleRef.current = (angleRef.current + autoRotateSpeed * delta * 0.02) % 360
         updateNodePositions()

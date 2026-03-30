@@ -109,7 +109,7 @@ export function GuidedTour() {
         }
         window.dispatchEvent(new CustomEvent('orbital-tour', { detail: { action: 'select', nodeIndex: nodesToShow[i] } }))
         i++
-        setTimeout(showNext, 1200)
+        setTimeout(showNext, 1800)
       }
       setTimeout(showNext, 2200)
     }

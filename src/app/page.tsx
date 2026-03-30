@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useInView } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useRef, useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { GuidedTour } from '@/components/GuidedTour'
@@ -168,9 +168,7 @@ const workflowSteps = [
 
 function WorkflowDemo() {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(sectionRef, { once: false, margin: '-100px' })
   const [activeStep, setActiveStep] = useState(-1)
-  const hasPlayedRef = useRef(false)
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
 
   const clearAllTimers = useCallback(() => {
@@ -191,13 +189,7 @@ function WorkflowDemo() {
     })
   }, [clearAllTimers])
 
-  useEffect(() => {
-    if (!isInView || hasPlayedRef.current) return
-    hasPlayedRef.current = true
-    playAnimation()
-    return clearAllTimers
-  }, [isInView, playAnimation, clearAllTimers])
-
+  // Only play when explicitly triggered by the tour — no auto-play on scroll
   useEffect(() => {
     function handleTourTrigger() {
       clearAllTimers()
