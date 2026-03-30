@@ -34,20 +34,45 @@ export function PersonalInfo({ fieldConfig, idDocument, onIdDocument, showMedica
     const preview = URL.createObjectURL(file)
     onIdDocument({ file, preview, ocrStatus: 'processing', ocrProgress: 0 })
 
-    const result = await processImage(file)
+    let extractedFields: Record<string, string> = {}
+    let status: 'success' | 'partial' | 'failed' = 'failed'
+    let ocrText = ''
+
+    // Try Azure Document Intelligence first (server-side, much more accurate)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/scan-id', { method: 'POST', body: formData })
+      if (res.ok) {
+        const data = await res.json()
+        extractedFields = data.extractedFields || {}
+        status = data.status || 'failed'
+        ocrText = `Azure AI (confidence: ${Math.round((data.confidence || 0) * 100)}%)`
+      }
+    } catch {
+      // Azure failed — silent fallback
+    }
+
+    // If Azure returned nothing, fall back to Tesseract.js (client-side)
+    if (Object.keys(extractedFields).length === 0) {
+      const result = await processImage(file)
+      extractedFields = (result.extractedFields || {}) as Record<string, string>
+      status = result.status
+      ocrText = result.text
+    }
 
     onIdDocument({
       file,
       preview,
-      ocrText: result.text,
-      ocrFields: result.extractedFields,
-      ocrStatus: result.status,
+      ocrText,
+      ocrFields: extractedFields,
+      ocrStatus: status,
     })
 
     // Auto-fill fields
-    if (result.extractedFields) {
+    if (extractedFields) {
       const filled = new Set<string>()
-      for (const [key, value] of Object.entries(result.extractedFields)) {
+      for (const [key, value] of Object.entries(extractedFields)) {
         if (value && typeof value === 'string') {
           setValue(key as keyof IntakeFormData, value, {
             shouldValidate: true,
