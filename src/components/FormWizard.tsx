@@ -50,7 +50,13 @@ export function FormWizard({ profile }: FormWizardProps) {
 
   const [missingFields, setMissingFields] = useState<string[]>([])
 
-  const steps = template.steps
+  // Filter out steps where all fields are disabled — skip empty sections
+  const steps = template.steps.filter((step) => {
+    // Always show steps with no fields (personal info upload, document upload, review)
+    if (step.fields.length === 0) return true
+    // Show step if at least one field is enabled
+    return step.fields.some((f) => fieldConfig[f]?.enabled !== false)
+  })
 
   // Step validation field maps
   const getStepFields = (stepId: string): string[] => {
