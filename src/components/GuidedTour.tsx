@@ -40,7 +40,7 @@ const tourSteps: TourStep[] = [
     title: 'Powerful Features',
     description: 'OCR document scanning, auto-save, PDF generation, multi-language support, notifications — everything built in. Watch the orbit showcase each one.',
     position: 'top',
-    delay: 7000,
+    delay: 10000,
   },
   {
     targetId: '__testimonials',
@@ -109,7 +109,7 @@ export function GuidedTour() {
         }
         window.dispatchEvent(new CustomEvent('orbital-tour', { detail: { action: 'select', nodeIndex: nodesToShow[i] } }))
         i++
-        setTimeout(showNext, 1800)
+        setTimeout(showNext, 2800)
       }
       setTimeout(showNext, 2200)
     }

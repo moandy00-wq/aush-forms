@@ -106,13 +106,17 @@ export default function RadialOrbitalTimeline({
     const idx = timelineData.findIndex((i) => i.id === id)
     const targetAngle = (270 - (idx / timelineData.length) * 360 + 360) % 360
 
-    // If a card is showing, fade it out first, then rotate
-    if (visibleId !== null) {
-      dismissCard(() => {
+    function startRotation() {
+      // Wait one frame for auto-rotate rAF to fully stop
+      requestAnimationFrame(() => {
         animateToAngle(targetAngle, () => showCard(id))
       })
+    }
+
+    if (visibleId !== null) {
+      dismissCard(startRotation)
     } else {
-      animateToAngle(targetAngle, () => showCard(id))
+      startRotation()
     }
   }, [timelineData, visibleId])
 
