@@ -23,13 +23,16 @@ export default function RadialOrbitalTimeline({
   autoRotateSpeed = 0.3,
 }: RadialOrbitalTimelineProps) {
   const [expandedId, setExpandedId] = useState<number | null>(null)
-  const [rotationAngle, setRotationAngle] = useState(0)
   const [autoRotate, setAutoRotate] = useState(true)
   const [radius, setRadius] = useState(180)
   const [showcase, setShowcase] = useState(false)
   const [showcaseIndex, setShowcaseIndex] = useState(0)
+  const [, forceRender] = useState(0) // for select/deselect re-renders only
+
   const containerRef = useRef<HTMLDivElement>(null)
   const visibleRef = useRef(false)
+  const angleRef = useRef(0)
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>([])
   const showcaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -55,8 +58,8 @@ export default function RadialOrbitalTimeline({
     setExpandedId(id)
     setAutoRotate(false)
     const idx = timelineData.findIndex((i) => i.id === id)
-    const targetAngle = (idx / timelineData.length) * 360
-    setRotationAngle(270 - targetAngle)
+    angleRef.current = 270 - (idx / timelineData.length) * 360
+    forceRender((n) => n + 1)
   }, [timelineData])
 
   const deselectNode = useCallback(() => {
@@ -95,33 +98,47 @@ export default function RadialOrbitalTimeline({
     return () => observer.disconnect()
   }, [])
 
-  // Auto-rotate with rAF for smooth animation
+  // rAF rotation — updates DOM directly, no React re-renders
   useEffect(() => {
     if (!autoRotate || showcase) return
     let animId: number
     let lastTime = 0
+
     function tick(time: number) {
-      if (lastTime) {
+      if (lastTime && visibleRef.current) {
         const delta = time - lastTime
-        if (visibleRef.current) {
-          setRotationAngle((prev) => (prev + autoRotateSpeed * delta * 0.02) % 360)
-        }
+        angleRef.current = (angleRef.current + autoRotateSpeed * delta * 0.02) % 360
+        updateNodePositions()
       }
       lastTime = time
       animId = requestAnimationFrame(tick)
     }
     animId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(animId)
-  }, [autoRotate, autoRotateSpeed, showcase])
+  }, [autoRotate, autoRotateSpeed, showcase, radius, timelineData.length])
+
+  function updateNodePositions() {
+    const total = timelineData.length
+    nodeRefs.current.forEach((el, index) => {
+      if (!el) return
+      const angle = ((index / total) * 360 + angleRef.current) % 360
+      const rad = (angle * Math.PI) / 180
+      const x = radius * Math.cos(rad)
+      const y = radius * Math.sin(rad)
+      const zIndex = Math.round(50 + 30 * Math.cos(rad))
+      const opacity = Math.max(0.35, Math.min(1, 0.35 + 0.65 * ((1 + Math.sin(rad)) / 2)))
+
+      el.style.transform = `translate(${x}px, ${y}px)`
+      el.style.zIndex = String(zIndex)
+      el.style.opacity = String(opacity)
+    })
+  }
 
   // Showcase auto-cycle
   useEffect(() => {
     if (!showcase) return
     function cycleNext() {
-      setShowcaseIndex((prev) => {
-        const next = (prev + 1) % timelineData.length
-        return next
-      })
+      setShowcaseIndex((prev) => (prev + 1) % timelineData.length)
       showcaseTimerRef.current = setTimeout(cycleNext, 2500)
     }
     showcaseTimerRef.current = setTimeout(cycleNext, 2500)
@@ -141,15 +158,16 @@ export default function RadialOrbitalTimeline({
     setAutoRotate(true)
   }
 
-  function getNodePos(index: number) {
-    const angle = ((index / timelineData.length) * 360 + rotationAngle) % 360
+  // Get static position for when rotation is paused (node selected)
+  function getStaticPos(index: number) {
+    const angle = ((index / timelineData.length) * 360 + angleRef.current) % 360
     const rad = (angle * Math.PI) / 180
-    const x = radius * Math.cos(rad)
-    const y = radius * Math.sin(rad)
-    // Cap z-index below tour overlay (z-90)
-    const zIndex = Math.round(50 + 30 * Math.cos(rad))
-    const opacity = Math.max(0.35, Math.min(1, 0.35 + 0.65 * ((1 + Math.sin(rad)) / 2)))
-    return { x, y, zIndex, opacity }
+    return {
+      x: radius * Math.cos(rad),
+      y: radius * Math.sin(rad),
+      zIndex: Math.round(50 + 30 * Math.cos(rad)),
+      opacity: Math.max(0.35, Math.min(1, 0.35 + 0.65 * ((1 + Math.sin(rad)) / 2))),
+    }
   }
 
   const statusLabel: Record<string, string> = {
@@ -170,10 +188,8 @@ export default function RadialOrbitalTimeline({
         style={{ height: containerHeight, maxWidth: orbitDiameter + 200, width: '100%' }}
         onClick={handleBgClick}
       >
-        {/* Orbit ring */}
         <div data-orbit className="absolute rounded-full border border-cyan-500/10" style={{ width: orbitDiameter, height: orbitDiameter }} />
 
-        {/* Center button */}
         <button
           onClick={(e) => { e.stopPropagation(); enterShowcase() }}
           className="absolute flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 via-teal-500 to-cyan-600 z-10 cursor-pointer transition-transform duration-300 hover:scale-110"
@@ -182,22 +198,22 @@ export default function RadialOrbitalTimeline({
           <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white/80 backdrop-blur-sm" />
         </button>
 
-        {/* Nodes */}
         {timelineData.map((item, index) => {
-          const pos = getNodePos(index)
           const isExpanded = expandedId === item.id
           const Icon = item.icon
+          // Use static position when paused (for expanded cards)
+          const pos = !autoRotate ? getStaticPos(index) : undefined
 
           return (
             <div
               key={item.id}
+              ref={(el) => { nodeRefs.current[index] = el }}
               className="absolute will-change-transform"
-              style={{
+              style={!autoRotate && pos ? {
                 transform: `translate(${pos.x}px, ${pos.y}px)`,
                 zIndex: isExpanded ? 80 : pos.zIndex,
                 opacity: isExpanded ? 1 : pos.opacity,
-                transition: expandedId !== null ? 'opacity 0.3s ease' : 'none',
-              }}
+              } : undefined}
               onClick={(e) => { e.stopPropagation(); toggleItem(item.id) }}
             >
               <div
@@ -268,7 +284,7 @@ export default function RadialOrbitalTimeline({
         })}
       </div>
 
-      {/* ── Fullscreen showcase mode ── */}
+      {/* Fullscreen showcase */}
       <AnimatePresence>
         {showcase && showcaseItem && (
           <motion.div
@@ -280,7 +296,6 @@ export default function RadialOrbitalTimeline({
           >
             <div className="absolute inset-0 bg-black/85 backdrop-blur-xl" />
 
-            {/* Close button */}
             <button
               onClick={exitShowcase}
               className="absolute top-6 right-6 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-neutral-700 bg-neutral-900/80 text-neutral-400 transition-all hover:text-white"
@@ -288,12 +303,11 @@ export default function RadialOrbitalTimeline({
               <X className="h-4 w-4" />
             </button>
 
-            {/* Progress dots */}
             <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
               {timelineData.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => { if (showcaseTimerRef.current) clearTimeout(showcaseTimerRef.current); setShowcaseIndex(i); }}
+                  onClick={() => { if (showcaseTimerRef.current) clearTimeout(showcaseTimerRef.current); setShowcaseIndex(i) }}
                   className={`h-2 rounded-full transition-all duration-500 ${
                     i === showcaseIndex ? 'w-8 bg-cyan-500' : 'w-2 bg-neutral-700 hover:bg-neutral-600'
                   }`}
@@ -301,7 +315,6 @@ export default function RadialOrbitalTimeline({
               ))}
             </div>
 
-            {/* Feature card */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={showcaseIndex}
@@ -356,7 +369,6 @@ export default function RadialOrbitalTimeline({
               </motion.div>
             </AnimatePresence>
 
-            {/* Center button to exit */}
             <button
               onClick={exitShowcase}
               className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-full border border-neutral-700 bg-neutral-900/80 px-5 py-2.5 text-sm font-medium text-neutral-400 transition-all hover:text-white"
