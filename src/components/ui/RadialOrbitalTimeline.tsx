@@ -88,13 +88,20 @@ export default function RadialOrbitalTimeline({
   }
 
   const selectNode = useCallback((id: number) => {
+    // Dismiss any open card first
+    setExpandedId(null)
     setAutoRotate(false)
+
     const idx = timelineData.findIndex((i) => i.id === id)
     const targetAngle = (270 - (idx / timelineData.length) * 360 + 360) % 360
-    animateToAngle(targetAngle, () => {
-      setExpandedId(id)
-      forceRender((n) => n + 1)
-    })
+
+    // Small delay to let the card fade out, then rotate smoothly
+    setTimeout(() => {
+      animateToAngle(targetAngle, () => {
+        setExpandedId(id)
+        forceRender((n) => n + 1)
+      })
+    }, 150)
   }, [timelineData])
 
   const deselectNode = useCallback(() => {
@@ -212,7 +219,7 @@ export default function RadialOrbitalTimeline({
   }
 
   const orbitDiameter = radius * 2
-  const containerHeight = Math.max(360, orbitDiameter + 120)
+  const containerHeight = Math.max(420, orbitDiameter + 180)
   const showcaseItem = showcase ? timelineData[showcaseIndex] : null
 
   return (
