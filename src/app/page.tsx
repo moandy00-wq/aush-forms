@@ -189,16 +189,21 @@ function WorkflowDemo() {
     })
   }, [clearAllTimers])
 
-  // Only play when explicitly triggered by the tour — no auto-play on scroll
+  // Stable ref to avoid re-registering listener on every render
+  const playRef = useRef(playAnimation)
+  playRef.current = playAnimation
+  const clearRef = useRef(clearAllTimers)
+  clearRef.current = clearAllTimers
+
   useEffect(() => {
     function handleTourTrigger() {
-      clearAllTimers()
+      clearRef.current()
       setActiveStep(-1)
-      setTimeout(() => playAnimation(), 100)
+      setTimeout(() => playRef.current(), 100)
     }
     window.addEventListener('workflow-tour-trigger', handleTourTrigger)
     return () => window.removeEventListener('workflow-tour-trigger', handleTourTrigger)
-  }, [playAnimation, clearAllTimers])
+  }, []) // empty deps — listener registered once, refs keep it current
 
   return (
     <section id="how-it-works" ref={sectionRef} className="relative border-t border-neutral-100 px-4 sm:px-6 py-16 sm:py-24 dark:border-neutral-900">

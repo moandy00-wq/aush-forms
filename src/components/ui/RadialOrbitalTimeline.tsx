@@ -22,17 +22,19 @@ export default function RadialOrbitalTimeline({
   timelineData,
   autoRotateSpeed = 0.3,
 }: RadialOrbitalTimelineProps) {
-  const [expandedId, setExpandedId] = useState<number | null>(null)
+  // visibleId = which card to show, cardOpacity controls fade in/out
+  const [visibleId, setVisibleId] = useState<number | null>(null)
+  const [cardOpacity, setCardOpacity] = useState(0)
   const [autoRotate, setAutoRotate] = useState(true)
   const [radius, setRadius] = useState(180)
   const [showcase, setShowcase] = useState(false)
   const [showcaseIndex, setShowcaseIndex] = useState(0)
-  const [, forceRender] = useState(0) // for select/deselect re-renders only
 
   const containerRef = useRef<HTMLDivElement>(null)
   const visibleRef = useRef(false)
   const angleRef = useRef(0)
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([])
+  const animatingRef = useRef(false)
   const showcaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -49,17 +51,30 @@ export default function RadialOrbitalTimeline({
 
   function handleBgClick(e: React.MouseEvent) {
     if (e.target === containerRef.current || (e.target as HTMLElement).dataset?.orbit) {
-      setExpandedId(null)
-      setAutoRotate(true)
+      dismissCard(() => setAutoRotate(true))
     }
   }
 
-  const animatingRef = useRef(false)
+  // ── Card fade helpers ──
+  function showCard(id: number) {
+    setCardOpacity(0)
+    setVisibleId(id)
+    // Wait for React to render the card at opacity 0, then fade in
+    setTimeout(() => setCardOpacity(1), 50)
+  }
 
-  // Smoothly animate angle from current to target over ~600ms
+  function dismissCard(onDone?: () => void) {
+    setCardOpacity(0)
+    // Wait for fade-out transition to finish, then unmount
+    setTimeout(() => {
+      setVisibleId(null)
+      onDone?.()
+    }, 350)
+  }
+
+  // ── Smooth rotation ──
   function animateToAngle(targetAngle: number, onDone?: () => void) {
     const startAngle = angleRef.current
-    // Find shortest rotation path
     let diff = targetAngle - startAngle
     if (diff > 180) diff -= 360
     if (diff < -180) diff += 360
@@ -71,7 +86,6 @@ export default function RadialOrbitalTimeline({
     function tick(time: number) {
       const elapsed = time - startTime
       const progress = Math.min(elapsed / duration, 1)
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3)
       angleRef.current = (startAngle + diff * eased) % 360
       if (angleRef.current < 0) angleRef.current += 360
@@ -88,29 +102,26 @@ export default function RadialOrbitalTimeline({
   }
 
   const selectNode = useCallback((id: number) => {
-    // Dismiss any open card first
-    setExpandedId(null)
     setAutoRotate(false)
-
     const idx = timelineData.findIndex((i) => i.id === id)
     const targetAngle = (270 - (idx / timelineData.length) * 360 + 360) % 360
 
-    // Small delay to let the card fade out, then rotate smoothly
-    setTimeout(() => {
-      animateToAngle(targetAngle, () => {
-        setExpandedId(id)
-        forceRender((n) => n + 1)
+    // If a card is showing, fade it out first, then rotate
+    if (visibleId !== null) {
+      dismissCard(() => {
+        animateToAngle(targetAngle, () => showCard(id))
       })
-    }, 150)
-  }, [timelineData])
+    } else {
+      animateToAngle(targetAngle, () => showCard(id))
+    }
+  }, [timelineData, visibleId])
 
   const deselectNode = useCallback(() => {
-    setExpandedId(null)
-    setAutoRotate(true)
+    dismissCard(() => setAutoRotate(true))
   }, [])
 
   function toggleItem(id: number) {
-    if (expandedId === id) deselectNode()
+    if (visibleId === id) deselectNode()
     else selectNode(id)
   }
 
@@ -140,7 +151,7 @@ export default function RadialOrbitalTimeline({
     return () => observer.disconnect()
   }, [])
 
-  // rAF rotation — updates DOM directly, no React re-renders
+  // rAF auto-rotation — always writes to DOM directly
   useEffect(() => {
     if (!autoRotate || showcase) return
     let animId: number
@@ -171,12 +182,12 @@ export default function RadialOrbitalTimeline({
       const opacity = Math.max(0.35, Math.min(1, 0.35 + 0.65 * ((1 + Math.sin(rad)) / 2)))
 
       el.style.transform = `translate(${x}px, ${y}px)`
-      el.style.zIndex = String(zIndex)
-      el.style.opacity = String(opacity)
+      el.style.zIndex = String(visibleId === timelineData[index]?.id ? 80 : zIndex)
+      el.style.opacity = String(visibleId === timelineData[index]?.id ? 1 : opacity)
     })
   }
 
-  // Showcase auto-cycle
+  // Showcase
   useEffect(() => {
     if (!showcase) return
     function cycleNext() {
@@ -188,28 +199,17 @@ export default function RadialOrbitalTimeline({
   }, [showcase, timelineData.length])
 
   function enterShowcase() {
-    setExpandedId(null)
-    setAutoRotate(false)
-    setShowcaseIndex(0)
-    setShowcase(true)
+    dismissCard(() => {
+      setAutoRotate(false)
+      setShowcaseIndex(0)
+      setShowcase(true)
+    })
   }
 
   function exitShowcase() {
     if (showcaseTimerRef.current) clearTimeout(showcaseTimerRef.current)
     setShowcase(false)
     setAutoRotate(true)
-  }
-
-  // Get static position for when rotation is paused (node selected)
-  function getStaticPos(index: number) {
-    const angle = ((index / timelineData.length) * 360 + angleRef.current) % 360
-    const rad = (angle * Math.PI) / 180
-    return {
-      x: radius * Math.cos(rad),
-      y: radius * Math.sin(rad),
-      zIndex: Math.round(50 + 30 * Math.cos(rad)),
-      opacity: Math.max(0.35, Math.min(1, 0.35 + 0.65 * ((1 + Math.sin(rad)) / 2))),
-    }
   }
 
   const statusLabel: Record<string, string> = {
@@ -221,6 +221,9 @@ export default function RadialOrbitalTimeline({
   const orbitDiameter = radius * 2
   const containerHeight = Math.max(420, orbitDiameter + 180)
   const showcaseItem = showcase ? timelineData[showcaseIndex] : null
+
+  // Find the expanded item for the card
+  const expandedItem = visibleId !== null ? timelineData.find(i => i.id === visibleId) : null
 
   return (
     <>
@@ -240,22 +243,16 @@ export default function RadialOrbitalTimeline({
           <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white/80 backdrop-blur-sm" />
         </button>
 
+        {/* Nodes — always positioned by rAF/animation, never by React inline styles */}
         {timelineData.map((item, index) => {
-          const isExpanded = expandedId === item.id
           const Icon = item.icon
-          // Use static position when paused (for expanded cards)
-          const pos = !autoRotate ? getStaticPos(index) : undefined
+          const isExpanded = visibleId === item.id
 
           return (
             <div
               key={item.id}
               ref={(el) => { nodeRefs.current[index] = el }}
               className="absolute will-change-transform"
-              style={!autoRotate && pos ? {
-                transform: `translate(${pos.x}px, ${pos.y}px)`,
-                zIndex: isExpanded ? 80 : pos.zIndex,
-                opacity: isExpanded ? 1 : pos.opacity,
-              } : undefined}
               onClick={(e) => { e.stopPropagation(); toggleItem(item.id) }}
             >
               <div
@@ -286,44 +283,52 @@ export default function RadialOrbitalTimeline({
               >
                 {item.title}
               </div>
-
-              {isExpanded && (
-                <div className="absolute top-[4.5rem] sm:top-20 left-1/2 -translate-x-1/2 w-48 sm:w-56 rounded border border-cyan-500/20 bg-[#0a0a0a]/95 p-3 sm:p-4 backdrop-blur-lg shadow-xl shadow-cyan-500/5">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-cyan-500/40" />
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-bold ${
-                      item.status === 'completed'
-                        ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                        : item.status === 'in-progress'
-                        ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
-                        : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
-                    }`}>
-                      {statusLabel[item.status]}
-                    </span>
-                  </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-white">{item.title}</h4>
-                  <p className="mt-1 text-[10px] sm:text-xs text-neutral-400 leading-relaxed">{item.content}</p>
-
-                  <div className="mt-2.5 pt-2.5 border-t border-white/5">
-                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] mb-1">
-                      <span className="flex items-center gap-1 text-neutral-500">
-                        <Zap size={9} />
-                        Capability
-                      </span>
-                      <span className="font-mono text-cyan-400">{item.energy}%</span>
-                    </div>
-                    <div className="w-full h-1 bg-neutral-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-teal-500"
-                        style={{ width: `${item.energy}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )
         })}
+
+        {/* Expanded card — rendered inside container but positioned absolutely from the selected node */}
+        {expandedItem && (
+          <div
+            className="absolute left-1/2 -translate-x-1/2 w-48 sm:w-56 rounded border border-cyan-500/20 bg-[#0a0a0a]/95 p-3 sm:p-4 backdrop-blur-lg shadow-xl shadow-cyan-500/5 z-[85]"
+            style={{
+              top: `calc(50% - ${radius}px + 4.5rem)`,
+              opacity: cardOpacity,
+              transition: 'opacity 0.3s ease',
+            }}
+          >
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-cyan-500/40" />
+            <div className="flex items-center justify-between mb-2">
+              <span className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-bold ${
+                expandedItem.status === 'completed'
+                  ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                  : expandedItem.status === 'in-progress'
+                  ? 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
+                  : 'bg-neutral-800 text-neutral-400 border border-neutral-700'
+              }`}>
+                {statusLabel[expandedItem.status]}
+              </span>
+            </div>
+            <h4 className="text-xs sm:text-sm font-bold text-white">{expandedItem.title}</h4>
+            <p className="mt-1 text-[10px] sm:text-xs text-neutral-400 leading-relaxed">{expandedItem.content}</p>
+
+            <div className="mt-2.5 pt-2.5 border-t border-white/5">
+              <div className="flex items-center justify-between text-[9px] sm:text-[10px] mb-1">
+                <span className="flex items-center gap-1 text-neutral-500">
+                  <Zap size={9} />
+                  Capability
+                </span>
+                <span className="font-mono text-cyan-400">{expandedItem.energy}%</span>
+              </div>
+              <div className="w-full h-1 bg-neutral-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-teal-500"
+                  style={{ width: `${expandedItem.energy}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Fullscreen showcase */}
